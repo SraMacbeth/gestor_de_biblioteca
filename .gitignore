@@ -1,0 +1,11 @@
+Entorno virtual
+venv/
+
+Caches de Python
+_pycache_/
+*.pyc
+
+Archivos varios
+notas.txt
+querys.py
+version_antigua.py
