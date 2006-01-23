@@ -1,6 +1,9 @@
 Entorno virtual
 venv/
 
+Base de datos
+db/biblioteca.db
+
 Caches de Python
 _pycache_/
 *.pyc
