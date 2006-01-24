@@ -11,10 +11,17 @@ class BaseView(Frame):
 		super().__init__(parent)
 		
 		self.header = HeaderBar(self, logout_callback=self.logout)
-		self.header.pack(fill="x", pady=10)
+		self.header.grid(row=0, column=1, sticky="e", padx=10, pady=10)
 		
 		self.main_area = Frame(self)
-		self.main_area.pack(expand=True ,fill="both")
+		self.main_area.grid(row=1, column=1, sticky="", padx=20, pady=20)
+		
+		self.grid_rowconfigure(0, weight=0)
+		self.grid_rowconfigure(1, weight=1)
+		
+		self.grid_columnconfigure(0, weight=1)
+		self.grid_columnconfigure(1, weight=0)
+		self.grid_columnconfigure(2, weight=1)
 	
 	def update_data(self, data):
 		username = data.get("username", "")
