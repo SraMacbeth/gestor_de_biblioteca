@@ -48,7 +48,7 @@ def login(email, password):
 	Parametros: 
 	email(str) direccion de correo del usuario
 	password(str) contraseña creada por el usuario
-	Retorna diferentes mensajes en funcion de los casos
+	Retorna diferentes mensajes en funcion de los casos y nombre y aṕellido del usuario en caso de login exitoso.
 	"""
 	
 	user = User.get_user_by_email(email)
@@ -60,7 +60,9 @@ def login(email, password):
 	elif user[4] != password:
 		return {"estado": "error", "mensaje":"Contraseña inválida."}
 	else:
-		return {"estado": "ok", "mensaje":"Login exitoso"}
+		first_name = user[1]
+		last_name = user[2]
+		return {"estado": "ok", "mensaje":"Login exitoso", "first_name": first_name, "last_name": last_name}
 	
 def register(firstName, lastName, email, password1, password2):
 	

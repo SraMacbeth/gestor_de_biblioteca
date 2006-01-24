@@ -46,7 +46,11 @@ class LoginFrame(Frame):
 		
 		if resultado["estado"] == "ok":
 			self.clean_entries()
-			self.controller.show_frame("HomeFrame")
+			first_name = resultado["first_name"]
+			last_name = resultado["last_name"]
+			username = f"{first_name} {last_name}"
+			self.actual_user = username
+			self.controller.show_frame("HomeFrame", data={"username": username})
 		else:
 			messagebox.showerror("Error", resultado["mensaje"])
 
