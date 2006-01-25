@@ -5,9 +5,10 @@ from components.password_container_frame import PasswordContainer
 
 class LoginFrame(Frame):
 	
-	def __init__(self, parent, controller):
+	def __init__(self, parent, controller, user=None):
 		super().__init__(parent)
 		self.controller = controller
+		self.user = user
 		
 		title_label = Label(self, text="Login", font=(None, 18, "bold"))
 		title_label.pack(pady=10)
@@ -49,7 +50,8 @@ class LoginFrame(Frame):
 			first_name = resultado["first_name"]
 			last_name = resultado["last_name"]
 			username = f"{first_name} {last_name}"
-			self.actual_user = username
+			self.controller.actual_user = username
+			self.controller.load_private_views()
 			self.controller.show_frame("HomeFrame", data={"username": username})
 		else:
 			messagebox.showerror("Error", resultado["mensaje"])

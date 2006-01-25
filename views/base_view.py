@@ -7,8 +7,10 @@ class BaseView(Frame):
 	Clase base para todas las vistas que requieren mostrar HeaderBar con nombre de usuario y botón de logout.
 	"""
 	
-	def __init__(self, parent):
+	def __init__(self, parent, controller, user=None):
 		super().__init__(parent)
+		self.controller = controller
+		self.user = user
 		
 		self.header = HeaderBar(self, logout_callback=self.logout)
 		self.header.grid(row=0, column=1, sticky="e", padx=10, pady=10)

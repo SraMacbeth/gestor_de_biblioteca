@@ -5,9 +5,10 @@ from components.password_container_frame import PasswordContainer
 
 class ResetPasswordFrame(Frame):
 	
-	def __init__(self, parent, controller):
+	def __init__(self, parent, controller, user=None):
 		super().__init__(parent)
 		self.controller = controller
+		self.user = user
 	
 		title_label = Label(self, text="Reseteo de contraseña", font=(None, 18, "bold"))
 		title_label.pack(pady=10)
