@@ -12,8 +12,8 @@ class BaseView(Frame):
 		self.controller = controller
 		self.user = user
 		
-		self.header = HeaderBar(self, logout_callback=self.logout)
-		self.header.grid(row=0, column=1, sticky="e", padx=10, pady=10)
+		self.header = HeaderBar(self, return_home_callback=self.return_home, logout_callback=self.logout)
+		self.header.grid(row=0, column=1, sticky="ew", padx=10, pady=10)
 		
 		self.main_area = Frame(self)
 		self.main_area.grid(row=1, column=1, sticky="", padx=20, pady=20)
@@ -28,6 +28,9 @@ class BaseView(Frame):
 	def update_data(self, data):
 		username = data.get("username", "")
 		self.header.set_username(username)
+						
+	def return_home(self):
+		self.controller.show_frame("HomeFrame")
 		
 	def logout(self):
 		self.actual_user = None

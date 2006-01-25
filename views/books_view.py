@@ -10,3 +10,6 @@ class BooksFrame(BaseView):
 		
 		self.label = Label(self.main_area, text="Books View")
 		self.label.grid(row=0, column=0, padx=10, pady=20, sticky="nsew")
+		
+		self.grid_rowconfigure(1, weight=1)
+

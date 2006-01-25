@@ -7,6 +7,8 @@ class HomeFrame(BaseView):
 		super().__init__(parent, controller)
 		self.controller = controller
 		self.user = user
+		
+		self.header.return_home_button.grid_remove()
 				
 		access = [("Buscador", "images/search.png", "SearchFrame"), ("Gestión de Libros", "images/book.png", "BooksFrame"), ("Alta y baja de Socios", "images/member.png", "MembersFrame"), ("Préstamos y Devoluciones", "images/borrow.png", "LoanFrame")]
 		
