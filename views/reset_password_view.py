@@ -37,6 +37,10 @@ class ResetPasswordFrame(Frame):
 		reset_password_button = Button(self, text="Reset Password", width=10, command = lambda : self.on_reset_click(email_entry.get(), self.password_container_1.password_entry.get(), self.password_container_2.password_entry.get()))
 		reset_password_button.pack(pady=10)
 					
+		return_login_label = Label(self, text="Cancelar y volver al Login", font=("None", 10, "underline"), foreground="blue")
+		return_login_label.pack(pady=10)
+		return_login_label.bind("<Button-1>", lambda event : controller.show_frame("LoginFrame"))			
+					
 	def on_reset_click(self, email, password1, password2):
 				
 		resultado = user_controller.reset_password(email, password1, password2)

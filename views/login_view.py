@@ -25,7 +25,7 @@ class LoginFrame(Frame):
 		self.password_container = PasswordContainer(self)
 		self.password_container.pack(pady=10)
 
-		forgot_password_label = Label(self, text="¿Olvidó su contraseña? Restablézcala.", font=("None", 8, "underline"), foreground="blue")
+		forgot_password_label = Label(self, text="¿Olvidó su contraseña? Restablézcala.", font=("None", 10, "underline"), foreground="blue")
 		forgot_password_label.pack(pady=10)
 		forgot_password_label.bind("<Button-1>", lambda event : controller.show_frame("ResetPasswordFrame"))
 
