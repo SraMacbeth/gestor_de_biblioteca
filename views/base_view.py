@@ -22,7 +22,7 @@ class BaseView(Frame):
 		self.grid_rowconfigure(1, weight=1)
 		
 		self.grid_columnconfigure(0, weight=1)
-		self.grid_columnconfigure(1, weight=0)
+		self.grid_columnconfigure(1, weight=1)
 		self.grid_columnconfigure(2, weight=1)
 	
 	def update_data(self, data):
