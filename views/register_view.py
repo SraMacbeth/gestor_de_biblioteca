@@ -3,7 +3,7 @@ from tkinter import messagebox
 from controllers import user_controller
 from components.password_container_frame import PasswordContainer
 
-class RegisterFrame(Frame):
+class RegisterView(Frame):
 	
 	def __init__(self, parent, controller, user=None):
 		super().__init__(parent)
@@ -51,7 +51,7 @@ class RegisterFrame(Frame):
 		
 		return_login_label = Label(self, text="¿Ya tiene una cuenta? Inicie sesión.", font=("None", 10, "underline"), foreground="blue")
 		return_login_label.pack(pady=10)
-		return_login_label.bind("<Button-1>", lambda event : controller.show_frame("LoginFrame"))	
+		return_login_label.bind("<Button-1>", lambda event : controller.show_frame("LoginView"))	
 				
 	def on_register_click(self, firstName, lastName, email, password,  secondPassword):
 		
@@ -59,6 +59,6 @@ class RegisterFrame(Frame):
 				
 		if resultado["estado"] == "ok":
 			messagebox.showinfo("Exito", resultado["mensaje"])
-			self.controller.show_frame("LoginFrame")
+			self.controller.show_frame("LoginView")
 		else:
 			messagebox.showerror("Error", resultado["mensaje"])

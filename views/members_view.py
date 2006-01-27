@@ -1,7 +1,7 @@
 from tkinter import *
 from views.base_view import BaseView
 
-class MembersFrame(BaseView):
+class MembersView(BaseView):
 	
 	def __init__(self, parent, controller, user=None):
 		super().__init__(parent, controller)

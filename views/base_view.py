@@ -16,10 +16,12 @@ class BaseView(Frame):
 		self.header.grid(row=0, column=1, sticky="ew", padx=10, pady=10)
 		
 		self.main_area = Frame(self)
-		self.main_area.grid(row=1, column=1, sticky="", padx=20, pady=20)
+		self.main_area.grid(row=2, column=1, sticky="nsew", padx=20, pady=20)
 		
 		self.grid_rowconfigure(0, weight=0)
 		self.grid_rowconfigure(1, weight=1)
+		self.grid_rowconfigure(2, weight=1)
+		self.grid_rowconfigure(3, weight=1)
 		
 		self.grid_columnconfigure(0, weight=1)
 		self.grid_columnconfigure(1, weight=1)
@@ -30,8 +32,8 @@ class BaseView(Frame):
 		self.header.set_username(username)
 						
 	def return_home(self):
-		self.controller.show_frame("HomeFrame")
+		self.controller.show_frame("HomeView")
 		
 	def logout(self):
 		self.actual_user = None
-		self.controller.show_frame("LoginFrame")
+		self.controller.show_frame("LoginView")

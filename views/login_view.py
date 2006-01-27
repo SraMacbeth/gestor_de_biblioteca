@@ -3,7 +3,7 @@ from tkinter import messagebox
 from controllers import user_controller
 from components.password_container_frame import PasswordContainer
 
-class LoginFrame(Frame):
+class LoginView(Frame):
 	
 	def __init__(self, parent, controller, user=None):
 		super().__init__(parent)
@@ -27,14 +27,14 @@ class LoginFrame(Frame):
 
 		forgot_password_label = Label(self, text="¿Olvidó su contraseña? Restablézcala.", font=("None", 10, "underline"), foreground="blue")
 		forgot_password_label.pack(pady=10)
-		forgot_password_label.bind("<Button-1>", lambda event : controller.show_frame("ResetPasswordFrame"))
+		forgot_password_label.bind("<Button-1>", lambda event : controller.show_frame("ResetPasswordView"))
 
 		login_button = Button(self, text="Iniciar sesión", width=10, command = lambda : self.on_login_click(self.email_entry.get(), self.password_container.password_entry.get()))
 		login_button.pack(pady=10)
 
 		register_label = Label(self, text="¿Todavía no es usuario? Regístrese.", font=("None", 10, "underline"), foreground="blue")
 		register_label.pack(pady=10)
-		register_label.bind("<Button-1>", lambda event : controller.show_frame("RegisterFrame"))
+		register_label.bind("<Button-1>", lambda event : controller.show_frame("RegisterView"))
 		
 	def clean_entries(self):
 		
@@ -52,7 +52,7 @@ class LoginFrame(Frame):
 			username = f"{first_name} {last_name}"
 			self.controller.actual_user = username
 			self.controller.load_private_views()
-			self.controller.show_frame("HomeFrame", data={"username": username})
+			self.controller.show_frame("HomeView", data={"username": username})
 		else:
 			messagebox.showerror("Error", resultado["mensaje"])
 

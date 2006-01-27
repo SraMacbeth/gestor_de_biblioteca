@@ -1,7 +1,7 @@
 from tkinter import *
 from views.base_view import BaseView
 
-class BooksFrame(BaseView):
+class BooksView(BaseView):
 	
 	def __init__(self, parent, controller, user=None):
 		super().__init__(parent, controller)
@@ -12,4 +12,3 @@ class BooksFrame(BaseView):
 		self.label.grid(row=0, column=0, padx=10, pady=20, sticky="nsew")
 		
 		self.grid_rowconfigure(1, weight=1)
-

@@ -1,13 +1,13 @@
 from tkinter import *
 from models import db
-from views.login_view import LoginFrame
-from views.reset_password_view import ResetPasswordFrame
-from views.register_view import RegisterFrame
-from views.home_view import HomeFrame
-from views.search_view import SearchFrame
-from views.books_view import BooksFrame
-from views.members_view import MembersFrame
-from views.loan_view import LoanFrame
+from views.login_view import LoginView
+from views.reset_password_view import ResetPasswordView
+from views.register_view import RegisterView
+from views.home_view import HomeView
+from views.search_view import SearchView
+from views.books_view import BooksView
+from views.members_view import MembersView
+from views.loan_view import LoanView
 
 class App(Tk):
 	
@@ -28,19 +28,19 @@ class App(Tk):
 		self.frames = {}
 		self.actual_user = None
 		
-		public_views = (LoginFrame, ResetPasswordFrame, RegisterFrame)
+		public_views = (LoginView, ResetPasswordView, RegisterView)
 			
 		for F in public_views:
 			name = F.__name__
 			frame = F(parent=self, controller=self)
-			frame.grid(row=0, column=0, sticky="nsew")
+			frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
 			self.frames[name] = frame
 		
-		self.show_frame("LoginFrame")
+		self.show_frame("LoginView")
 			
 	def load_private_views(self):
 		
-		private_views = (HomeFrame, SearchFrame, BooksFrame, MembersFrame, LoanFrame)
+		private_views = (HomeView, SearchView, BooksView, MembersView, LoanView)
 		
 		for F in private_views:
 			name = F.__name__
