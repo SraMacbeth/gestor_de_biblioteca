@@ -21,6 +21,7 @@ class App(Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("BiblioApp")
+		self.geometry("830x600")
 		self.resizable(False, False)
 		self.grid_rowconfigure(0, weight=1)
 		self.grid_columnconfigure(0, weight=1)

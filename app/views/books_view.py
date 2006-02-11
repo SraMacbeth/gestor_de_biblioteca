@@ -1,7 +1,8 @@
 from tkinter import *
 from views.base_view import BaseView
 from components.search_bar_frame import SearchBar
-
+from components.search_result_container_frame import SearchResultContainer
+from controllers import book_controller
 
 class BooksView(BaseView):
 	
@@ -11,25 +12,95 @@ class BooksView(BaseView):
 		self.user = user
 		
 		self.search_bar = SearchBar(self.main_area, search_callback=self.search, search_type='book', show_entity_selection=False)
-		self.search_bar.grid(row=0, column=0, sticky="w")
+		self.search_bar.grid(row=0, column=0, sticky="ew")
 		
 		text_label_updated = self.search_bar.set_text_label("Ingrese el ID del libro que desea buscar:")
+		
+		self.search_result_container = SearchResultContainer(self.main_area)
+		self.search_result_container.grid(row=1, column=0, sticky="ew")
+		
+		self.action_button_container = Frame(self.main_area)
+		self.action_button_container.grid(row=1, column=1, sticky="s", padx=5)
+		self.action_button_container.grid_remove()
+		
+		self.edit_button = Button(self.action_button_container, text="✎", font=(None, 15, "bold"), fg="green", command=self.edit_book, state=DISABLED)
+		self.edit_button.grid(row=0, column=0, padx=5)
+		
+		self.delete_button = Button(self.action_button_container, text="X", font=(None, 15, "bold"), fg="red", command=self.delete_book, state=DISABLED)
+		self.delete_button.grid(row=0, column=1, padx=5)
+		
+		self.main_area.grid_columnconfigure(0, weight=1)
 
-		self.text_search_label = Label(self.main_area, text="")
-		self.text_search_label .grid(row=1, column=0, pady=10, sticky="w")
+	def clean_entries(self, entry):
+		entry.delete(0, END)
 		
-		self.result_label = Label(self.main_area, text="")
-		self.result_label.grid(row=2, column=0, pady=10, sticky="w")
-		
-		self.grid_rowconfigure(1, weight=1)
-	
 	def search(self):
+			
+		self.search_result_container.clear_result_frame()
 		
-		search_text = self.search_bar.get_search_text()
-		self.text_search_label.config(text=f"Resultado encontrado para la búsqueda: {search_text}")
+		book_id = self.search_bar.get_search_text()
+		
+		self.search_result_container.text_search_label.config(text=f"Resultado para la búsqueda: {book_id}")
+		
+		self.search_result_container.text_search_label .grid(row=0, column=0, pady=10, sticky="w")
 
 		search_entity = self.search_bar.get_search_entity()
 		
-		print("Buscando...")
+		result = book_controller.search_book_by_id(book_id)
+		
+		self.action_button_container.grid_remove()
+		self.edit_button.config(state=DISABLED)
+		self.delete_button.config(state=DISABLED)
+
+		
+		if result["estado"] == "ok":
+
+			data = result["detalles"]
+						
+			register_id = data[0]
+			title = data[1]
+			author_firstname = data[2]
+			author_lastname = data[3]
+			author_name = f"{author_firstname} {author_lastname}"
+			isbn = data[5]
+			publisher = data[6]
+			stock = data[7]
+	
+			treeview_values = [register_id, title, author_name, isbn, publisher, stock]
+
+			self.search_result_container.result_treeview.insert(parent='', index='end', values=treeview_values)
+	
+			self.search_result_container.adjust_columns_to_content(title, author_name, publisher)
+
+			self.search_result_container.result_treeview.grid(row=1,column=0, sticky="nsew")
+			self.search_result_container.xscrollbar_treeview.grid(row=2,column=0, sticky="ew")
+			
+			self.action_button_container.grid()
+			self.edit_button.config(state=NORMAL)
+			self.delete_button.config(state=NORMAL)
+		
+			#self.clean_entries(self.search_bar.search_bar_entry)
+		else:
+			self.clean_entries(self.search_bar.search_bar_entry)
+			self.search_result_container.result_label.config(text=result["mensaje"], font=(None, 10, "bold"), fg="red", anchor="w")
+			self.search_result_container.result_label.grid(row=1, column=0, pady=10, sticky="ew")
+	
+	def edit_book(self):
+		"""
+		Función de marcador para la edición.
+		TODO: Implementar la lógica de edición. 
+		"""
+		print("Funcionalidad de edición pendiente.")
+		
+	def delete_book(self):
+		"""
+		Función de marcador para la eliminación.
+		TODO: Implementar la lógica de eliminación. 
+		"""
+		print("Funcionalidad de eliminación pendiente.")
+
+		
+		
+
 		
 		
