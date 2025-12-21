@@ -34,7 +34,7 @@ class ResetPasswordView(Frame):
 		self.password_container_2 = PasswordContainer(self)
 		self.password_container_2.pack(pady=10)
 			
-		reset_password_button = Button(self, text="Reset Password", width=10, command = lambda : self.on_reset_click(email_entry.get(), self.password_container_1.password_entry.get(), self.password_container_2.password_entry.get()))
+		reset_password_button = Button(self, text="Reset Password", width=10, padx=20, pady=10, command = lambda : self.on_reset_click(email_entry.get(), self.password_container_1.password_entry.get(), self.password_container_2.password_entry.get()))
 		reset_password_button.pack(pady=10)
 					
 		return_login_label = Label(self, text="Cancelar y volver al Login", font=("None", 10, "underline"), foreground="blue")

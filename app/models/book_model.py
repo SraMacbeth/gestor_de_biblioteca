@@ -1,6 +1,9 @@
 import sqlite3
 from models import db 
 
+STATUS_AVAILABLE = "Disponible"
+STATUS_LOANED = "Prestado"
+
 class Book():
 	
 	def __init__(self, book_id, isbn, title, genre_id, user_id):
@@ -63,4 +66,92 @@ class Book():
 				
 		except sqlite3.Error as e:
 			print(e)
+	
+	@classmethod		
+	def get_all_genres(cls):
+		
+		"""
+		Obtiene los géneros cargados en la base de datos.
+		Retorna una tupla con los nombres de los géneros si hay o None si no hay
+		"""
+		
+		try:
+			with db.get_db_connection() as connection: 
+				cursor = connection.cursor()
+				cursor.execute("SELECT name FROM genre;")
+				return cursor.fetchall()
+		except sqlite3.Error as e:
+			print(e)
+			
+	@classmethod
+	def add_book(cls, title, authors, genre, isbn, publisher, copies, user_id):
+		
+		"""
+		Inserta los datos de un nuevo libro en la base de datos
+		Parametros: 
+		isbn(int) idstr) isbn del libro
+		title(str) título del libro
+		authors(str) nombre y apellido de los autores
+		publisher(str) editorial
+		genre(str) género al que pertenece el libro
+		user_id(int) id del usuario que ingresó el libro
+		copies(str) cantidad de copias ingresadas
+		"""
+
+		try:
+			with db.get_db_connection() as connection: 
+				cursor = connection.cursor()
+				
+				#Verificar si el libro existe en la base de datos
+				cursor.execute("SELECT * FROM book WHERE isbn = ?", (isbn,))
+				
+				book_in_db = cursor.fetchall()
+				
+				if book_in_db:
+					
+					return False
+					
+				else:
+				
+					#Extraer genre_id o ingresar un nuevo género si no existe
+					cursor.execute("SELECT genre_id FROM genre WHERE name = ?", (genre,))
+					
+					row = cursor.fetchone()
+								
+					if row:
+						genre_id = row[0]
+					else:
+						cursor.execute("INSERT INTO genre (name) VALUES (?)", (genre,))
+						genre_id = cursor.lastrowid
+						
+					#Insertar libro
+					cursor.execute("INSERT INTO book (isbn, title, publisher, genre_id, user_id) VALUES(?, ?, ?, ?, ?);", (isbn, title, publisher, genre_id, user_id))
+					book_id = cursor.lastrowid
+									
+					#Verificar / insertar autores y asociar tablas
+					for first_name, last_name in authors:
+						cursor.execute("SELECT author_id FROM author WHERE first_name = ? AND last_name = ?", (first_name, last_name))
+					
+						row = cursor.fetchone()
+										
+						if row:
+							author_id = row[0]
+						else:
+							cursor.execute("INSERT INTO author (first_name, last_name) VALUES (?, ?)", (first_name, last_name))
+							author_id = cursor.lastrowid
+						
+						cursor.execute("INSERT INTO book_author (book_id, author_id) VALUES (?, ?)", (book_id, author_id))
+														
+					#Insertar copias
+					for i in range(copies):
+						cursor.execute("INSERT INTO copy (book_id, isbn, status, user_id) VALUES (?, ?, ?, ?)", (book_id, isbn, STATUS_AVAILABLE, user_id))
+						
+					connection.commit()
+					return True
+					
+		except sqlite3.Error as e:
+			print(e)
+	
+
+	
 				 

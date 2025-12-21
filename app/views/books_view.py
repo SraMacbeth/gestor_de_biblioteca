@@ -2,6 +2,7 @@ from tkinter import *
 from views.base_view import BaseView
 from components.search_bar_frame import SearchBar
 from components.search_result_container_frame import SearchResultContainer
+from components.book_form import BookForm
 from controllers import book_controller
 
 class BooksView(BaseView):
@@ -28,6 +29,9 @@ class BooksView(BaseView):
 		
 		self.delete_button = Button(self.action_button_container, text="X", font=(None, 15, "bold"), fg="red", command=self.delete_book, state=DISABLED)
 		self.delete_button.grid(row=0, column=1, padx=5)
+		
+		self.new_book_button = Button(self.main_area, text="Agregar nuevo libro", command = self.open_new_book_form)
+		self.new_book_button.grid(row=3, column=0, columnspan=4, pady=10)
 		
 		self.main_area.grid_columnconfigure(0, weight=1)
 
@@ -99,8 +103,12 @@ class BooksView(BaseView):
 		"""
 		print("Funcionalidad de eliminación pendiente.")
 
+	def open_new_book_form(self):
 		
+		new_book_form = BookForm("Agregar nuevo libro", parent=self, controller=self, type_form="new_book_form")
 		
-
+		new_book_form.transient(self)
 		
+		new_book_form.grab_set()
 		
+		self.wait_window(new_book_form)

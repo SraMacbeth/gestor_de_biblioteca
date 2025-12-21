@@ -8,6 +8,18 @@ from views.search_view import SearchView
 from views.books_view import BooksView
 from views.members_view import MembersView
 from views.loan_view import LoanView
+import os
+import sys
+
+# --- Garantizar que la aplicación funcione sin importar desde qué carpeta se ejecute (ya sea por terminal o mediante el botón 'Play' de VS Code) ---
+# Obtener la ruta absoluta de donde está el archivo que se está ejecutando
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Cambiar el "directorio de trabajo" de Python a esa carpeta
+os.chdir(base_dir)
+
+# Agregar la carpeta base al PATH de Python para facilitar importaciones MVC
+sys.path.append(base_dir)
 
 class App(Tk):
 	
@@ -21,7 +33,7 @@ class App(Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("BiblioApp")
-		self.geometry("830x600")
+		#self.geometry("830x600")
 		self.resizable(False, False)
 		self.grid_rowconfigure(0, weight=1)
 		self.grid_columnconfigure(0, weight=1)

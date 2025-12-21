@@ -46,7 +46,7 @@ class RegisterView(Frame):
 		self.password_container_2 = PasswordContainer(self)
 		self.password_container_2.pack(pady=10)
 
-		register_buttton = Button(self, text="Register", width=10, command = lambda : self.on_register_click(first_name_entry.get(), last_name_entry.get(), email_entry.get(), self.password_container_1.password_entry.get(),  self.password_container_2.password_entry.get()))
+		register_buttton = Button(self, text="Register", width=10, padx=10, pady=10, command = lambda : self.on_register_click(first_name_entry.get(), last_name_entry.get(), email_entry.get(), self.password_container_1.password_entry.get(),  self.password_container_2.password_entry.get()))
 		register_buttton.pack(pady=10)
 		
 		return_login_label = Label(self, text="¿Ya tiene una cuenta? Inicie sesión.", font=("None", 10, "underline"), foreground="blue")

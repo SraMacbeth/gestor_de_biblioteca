@@ -29,7 +29,7 @@ class LoginView(Frame):
 		forgot_password_label.pack(pady=10)
 		forgot_password_label.bind("<Button-1>", lambda event : controller.show_frame("ResetPasswordView"))
 
-		login_button = Button(self, text="Iniciar sesión", width=10, command = lambda : self.on_login_click(self.email_entry.get(), self.password_container.password_entry.get()))
+		login_button = Button(self, text="Iniciar sesión", width=10, padx=10, pady=10, command = lambda : self.on_login_click(self.email_entry.get(), self.password_container.password_entry.get()))
 		login_button.pack(pady=10)
 
 		register_label = Label(self, text="¿Todavía no es usuario? Regístrese.", font=("None", 10, "underline"), foreground="blue")

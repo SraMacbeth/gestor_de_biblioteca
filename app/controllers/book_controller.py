@@ -44,3 +44,38 @@ def search_book_by_id(book_id):
 		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, copies_number]
 				
 		return {"estado": "ok", "mensaje":"Libro encontrado", "detalles" : book_details} 
+
+def add_book(title, authors, genre, isbn, publisher, copies, user_id):
+	
+	"""
+	agrega un nuevo libro en la base de datos
+	Parametros: 
+	isbn(int) idstr) isbn del libro
+	title(str) título del libro
+	authors(str) nombre y apellido de los autores
+	publisher(str) editorial
+	genre(str) género al que pertenece el libro
+	user_id(int) id del usuario que ingresó el libro
+	copies(str) cantidad de copias ingresadas
+	Retorna diferentes mensajes en funcion de los casos
+	"""	
+	
+	if isbn == "" or title == "" or authors == "" or publisher == "" or genre == "" or user_id == "" or copies == "":
+		return {"estado": "error", "mensaje":"Los compos no pueden estar vacíos"}
+		
+	new_book = Book.add_book(title, authors, genre, isbn, publisher, copies, user_id)
+	
+	if new_book == False:
+		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}
+	else:
+		return {"estado": "ok", "mensaje":"Libro ingresado exitosamente."}
+
+def list_genres():
+	
+	""""
+	Crea una lista con todos los géneros precargados en la base de datos.
+	"""
+	
+	genres = Book.get_all_genres()
+	
+	return [row[0] for row in genres]
