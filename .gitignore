@@ -1,9 +1,14 @@
-Entorno virtual
+# Entorno virtual
 venv/
+ENV/
+env/
 
-Base de datos
-db/biblioteca.db
+# Python cache
+__pycache__/
+*.py[cod]
 
-Caches de Python
-_pycache_/
-*.pyc
+# Base de datos (opcional, si quieres que cada uno empiece con una limpia)
+app/db/*.db
+
+# Archivos de sistema Mac
+.DS_Store
