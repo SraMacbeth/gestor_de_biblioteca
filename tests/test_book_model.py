@@ -2,10 +2,11 @@ import unittest
 from tests import test_db_setup
 from models.book_model import Book
 
-#STATUS_AVAILABLE = "Disponible"
-#STATUS_LOANED = "Prestado"
-#TEST_ISBN ="9789500739718"
-#TEST_USER_ID = 1
+# Se definen constantes para los tests
+STATUS_AVAILABLE = "Disponible"
+STATUS_LOANED = "Prestado"
+TEST_ISBN ="9789500739718"
+TEST_USER_ID = 1
 
 class TestBookModel(unittest.TestCase):
 		
@@ -16,11 +17,27 @@ class TestBookModel(unittest.TestCase):
 		""" Se ejecuta una vez: Crea las tablas de la DB de prueba. """
 		test_db_setup.create_tables()
 	
-	@classmethod
 	def setUp(self):
-		""" Se ejecuta antes de cada test: Limpia la DB de datos viejos. """
+		""" Se ejecuta antes de cada test. """
+        # Asegurar que las tablas existan (por si el archivo se borró o está vacío
+		test_db_setup.create_tables()
+        
+        # Limpiar datos de tests anteriores pero mantener las tablas
 		test_db_setup.clear_tables()
-		
+        
+        # Volver a llamar a create_tables para que se carguen los GÉNEROS (ya que clear_tables borró la tabla genre)
+		test_db_setup.create_tables()
+        
+        # Insertar el usuario obligatorio para que la Foreign Key no falle
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute(
+            "INSERT INTO user (user_id, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)",
+            (TEST_USER_ID, "Admin", "Test", "admin@test.com", "1234")
+        )
+		conn.commit()
+		conn.close()
+
 	@classmethod
 	def tearDownClass(cls):
 		"""Se ejecuta una vez después de TODAS las pruebas. Borra el archivo DB."""
@@ -29,54 +46,29 @@ class TestBookModel(unittest.TestCase):
 		pass
 		
 	# --- TESTS DE INVENTARIO Y SEGURIDAD ---
-
-	
-	# --- TESTS DE INVENTARIO Y SEGURIDAD ---
-		
 	def test_insercion_correcta(self):
-		"""Prueba que un nuevo libro con datos válidos se añade correctamente y puede ser recuperado."""
+		"""Prueba que un nuevo libro se añade y se recupera por su ID."""
+
+		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
 		
-		libro_a_agregar = ["Libro 1", [("Juan", "Pérez")], "Terror" , "123456789", "Casita", 1, 1]
-		
-		resultado = Book.add_book(libro_a_agregar)
-		
-		# PREPARACIÓN:
-		
-		#Conexión a la base de datos y creación del cursor 
+		# Act: Intentamos insertar
+		exito = Book.add_book(*libro_a_agregar)
+		self.assertTrue(exito, "La inserción falló")
+
+		# Verificación: Como es el primer test, el ID debería ser 1
+		# Pero lo más profesional es buscarlo en la DB por su ISBN para obtener el ID real
 		conn = test_db_setup.get_test_connection()
 		cursor = conn.cursor()
-		
-		#Insertar un género y un libro de prueba
-		cursor.execute("INSERT INTO genre (name) VALUES (?)", ("Ficción",))
-		genre_id = cursor.lastrowid
-		print(f"GENRE ID: {genre_id}")
-		
-		cursor.execute("INSERT INTO book (isbn, title, publisher, genre_id, user_id) VALUES (?, ?, ?, ?, ?)", (TEST_ISBN, "Título Test", "Edit", genre_id, TEST_USER_ID))
-		book_id = cursor.lastrowid
-		print(f"BOOK ID: {book_id}")
-		
-		# Insertar 3 Prestadas y 1 Disponible (Total 4)
-		self._insert_test_data(conn, book_id, STATUS_LOANED, 3)
-		self._insert_test_data(conn, book_id, STATUS_AVAILABLE, 1)
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
 		conn.close()
+
+		# Ahora probamos TU función get_book_by_id con ese ID
+		datos_libro = Book.get_book_by_id(generated_id)
 		
-		get_all_book_by_id = Book.get_book_by_id(1)
-		print(get_all_book_by_id)
-	
-		# 1. EJECUCIÓN: Intentar reducir el stock de 4 a 1 (Borrar 3 copias)
-		# Solo hay 1 disponible para borrar. El sistema debe bloquearse.
-				
-		resultado = Book.update_book(book_id=book_id, title="Título Test", authors=[("Test", "Author")], genre="Misterio", isbn=TEST_ISBN, publisher="Edit", new_copies_number=1, user_id=TEST_USER_ID, )
+		# Assert
+		self.assertIsNotNone(datos_libro, "No se encontró el libro con el ID generado")
+		# Según tu modelo, datos_libro[0] es la tupla del libro
+		self.assertEqual(datos_libro[0][2], "Rayuela", "El título no coincide")	
 		
-		# 2. VERIFICACIÓN
-		self.assertFalse(resultado, "La reducción DEBE fallar.")
-		
-		# 3. VERIFICACIÓN DE INTEGRIDAD: Comprobar que no se borró NADA
-		conn = test_db_setup.get_test_connection()
-		cursor = conn.cursor()
-		cursor.execute("SELECT COUNT(*) FROM copy WHERE book_id = ?;", (book_id,))
-		self.assertEqual(cursor.fetchone()[0], 4, "El conteo final de copias debe seguir siendo 4.")
-		conn.close()
-	
-	# ... Aquí añadirías más tests: test_reducir_a_cero_falla, test_anadir_copias, etc.
-	

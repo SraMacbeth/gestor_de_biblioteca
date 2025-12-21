@@ -1,11 +1,14 @@
-import sqlite3
 import os
+import sqlite3
 
 """ Archivo de configuración de la base de datos de prueba. 
 Asegura que todas las pruebas se ejecuten en una base de datos temporal y limpia. """
 
-#Nombre del archivo de base de datos de prueba
-TEST_DB = "test_data/test_library.db"	
+# Obtener la ruta de la carpeta donde está este archivo (tests/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Subir un nivel y entrar en test_data/
+TEST_DB = os.path.join(BASE_DIR, "..", "test_data", "test_library.db")
+
 
 def get_test_connection():
 	""" Retorna una conexión a la base de datos de prueba """
@@ -13,6 +16,8 @@ def get_test_connection():
 
 def create_tables():
 	""" Crea las tablas necesarias en la base de datos de prueba. """
+	# Crear 'test_data' si no existe
+	os.makedirs(os.path.dirname(TEST_DB), exist_ok=True)
 	connection = get_test_connection()
 	cursor = connection.cursor()
 	

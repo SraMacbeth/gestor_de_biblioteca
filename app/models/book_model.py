@@ -39,7 +39,7 @@ class Book():
 					genre_id = cursor.fetchone()
 									
 					#Obtener nombre del género 
-					cursor.execute("SeLECT name FROM genre WHERE genre_id = ?;", (genre_id[0],))
+					cursor.execute("SELECT name FROM genre WHERE genre_id = ?;", (genre_id[0],))
 					
 					genre_name = cursor.fetchone()
 					
@@ -48,12 +48,12 @@ class Book():
 					(book_id,))
 					
 					author_id = cursor.fetchone()
-														
+											
 					#Obtener nombre y apellido del autor
 					cursor.execute("SeLECT first_name, last_name FROM author WHERE author_id = ?;", (author_id[0],))
 					
 					author_name = cursor.fetchall()
-																		
+											
 					#Obtener cantidad de copias
 					cursor.execute("SELECT * FROM copy WHERE book_id = ?;", (book_id,))
 					
@@ -105,14 +105,11 @@ class Book():
 				#Verificar si el libro existe en la base de datos
 				cursor.execute("SELECT * FROM book WHERE isbn = ?", (isbn,))
 				
-				book_in_db = cursor.fetchall()
-				
-				if book_in_db:
-					
+				if cursor.fetchone():
 					return False
 					
 				else:
-				
+
 					#Extraer genre_id o ingresar un nuevo género si no existe
 					cursor.execute("SELECT genre_id FROM genre WHERE name = ?", (genre,))
 					
@@ -150,7 +147,8 @@ class Book():
 					return True
 					
 		except sqlite3.Error as e:
-			print(e)
+			print(f"\n--- ERROR DE SQLITE EN ADD_BOOK: {e} ---") # Esta línea te dirá la verdad			
+			return False
 	
 
 	

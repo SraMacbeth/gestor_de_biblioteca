@@ -1,14 +1,23 @@
 import sqlite3
+import os
+
+# Obtener la ruta absoluta de la carpeta 'app'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def get_db_connection():
-	
-	"""
-	Establece la conexion con la base de datos
-	No recibe parametros
-	Retorna la conexion
-	""" 	
-	
-	return sqlite3.connect("db/biblioteca.db")
+    # Si estamos ejecutando tests, usamos la carpeta test_data que está fuera de app
+    if os.environ.get('TESTING') == 'True':
+        # Subimos un nivel desde 'app' para encontrar 'test_data'
+        ROOT_DIR = os.path.dirname(BASE_DIR)
+        db_path = os.path.join(ROOT_DIR, "test_data", "test_library.db")
+    else:
+        # Ruta normal para la app real
+        db_path = os.path.join(BASE_DIR, "database", "library.db")
+    
+    # Verificamos que la carpeta exista antes de conectar
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    
+    return sqlite3.connect(db_path)
 
 def setup_database():
 	

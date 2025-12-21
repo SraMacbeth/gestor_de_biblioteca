@@ -7,7 +7,7 @@ env/
 __pycache__/
 *.py[cod]
 
-# Base de datos (opcional, si quieres que cada uno empiece con una limpia)
+# Base de datos
 app/db/*.db
 
 # Archivos de sistema Mac
