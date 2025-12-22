@@ -110,7 +110,7 @@ def clear_tables():
 	cursor.execute("DELETE FROM user;")
 	cursor.execute("DELETE FROM author;")
 	cursor.execute("DELETE FROM member;")
-	cursor.execute("DELETE FROM genre;")
+	#cursor.execute("DELETE FROM genre;")
 	cursor.execute("DELETE FROM book;")
 	cursor.execute("DELETE FROM book_author;")
 	cursor.execute("DELETE FROM book_genre;")

@@ -1,6 +1,9 @@
+import os
+os.environ['TESTING'] = 'True'
+
 import unittest
-from tests import test_db_setup
-from models.book_model import Book
+from . import test_db_setup
+from app.models.book_model import Book
 
 # Se definen constantes para los tests
 STATUS_AVAILABLE = "Disponible"
@@ -19,17 +22,16 @@ class TestBookModel(unittest.TestCase):
 	
 	def setUp(self):
 		""" Se ejecuta antes de cada test. """
-        # Asegurar que las tablas existan (por si el archivo se borró o está vacío
-		test_db_setup.create_tables()
-        
         # Limpiar datos de tests anteriores pero mantener las tablas
 		test_db_setup.clear_tables()
         
-        # Volver a llamar a create_tables para que se carguen los GÉNEROS (ya que clear_tables borró la tabla genre)
-		test_db_setup.create_tables()
-        
         # Insertar el usuario obligatorio para que la Foreign Key no falle
 		conn = test_db_setup.get_test_connection()
+
+		db_name = conn.execute("PRAGMA database_list").fetchall()[0][2]
+		if "test_library.db" not in db_name:
+			self.fail(f"¡PELIGRO! El test intentó conectarse a: {db_name}")
+
 		cursor = conn.cursor()
 		cursor.execute(
             "INSERT INTO user (user_id, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)",
@@ -47,7 +49,7 @@ class TestBookModel(unittest.TestCase):
 		
 	# --- TESTS DE INVENTARIO Y SEGURIDAD ---
 	def test_insercion_correcta(self):
-		"""Prueba que un nuevo libro se añade y se recupera por su ID."""
+		"""Prueba que un nuevo libro se añade correctamente."""
 
 		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
 		
@@ -55,8 +57,14 @@ class TestBookModel(unittest.TestCase):
 		exito = Book.add_book(*libro_a_agregar)
 		self.assertTrue(exito, "La inserción falló")
 
-		# Verificación: Como es el primer test, el ID debería ser 1
-		# Pero lo más profesional es buscarlo en la DB por su ISBN para obtener el ID real
+	def test_buscar_por_id(self): 
+		'''Asegura que get_book_by_id devuelve exactamente lo que se espera'''
+		
+		# PREPARACIÓN: Insertar un libro manualmente para tener algo que buscar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID en la DB por el ISBN del libro
 		conn = test_db_setup.get_test_connection()
 		cursor = conn.cursor()
 		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
@@ -64,11 +72,62 @@ class TestBookModel(unittest.TestCase):
 		generated_id = row[0]
 		conn.close()
 
-		# Ahora probamos TU función get_book_by_id con ese ID
+		# Act
 		datos_libro = Book.get_book_by_id(generated_id)
 		
 		# Assert
 		self.assertIsNotNone(datos_libro, "No se encontró el libro con el ID generado")
-		# Según tu modelo, datos_libro[0] es la tupla del libro
-		self.assertEqual(datos_libro[0][2], "Rayuela", "El título no coincide")	
 		
+		# Verificar el libro encontrado por su titulo
+		self.assertEqual(datos_libro[0][2], "Rayuela", "El título no coincide")	
+
+	def test_buscar_por_id_inexistente(self):
+		'''Asegura que si se busca un libro con un id inexistente devuelve el error'''
+		
+		# PREPARACIÓN: Insertar un libro manualmente para tener algo que buscar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID del libro ingresado en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		# Id inexistente a buscar, se calcula en base al id generado.
+		id_inexistente = generated_id + 1
+
+		# Act
+		datos_libro = Book.get_book_by_id(id_inexistente)
+		
+		# Assert
+		self.assertIsNone(datos_libro, "Error: se encontró un libro con el ID ingresado")
+		
+	def test_eliminar_libro(self): 
+		'''Verifica que al borrar un libro, también se borran sus copias (o se manejen las claves foráneas)'''
+		
+		# PREPARACIÓN: Insertar un libro manualmente para tener algo que eliminar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID del libro ingresado en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		# Act
+		datos_libro = Book.delete_(generated_id)
+		
+		# Assert
+		self.assertIsNone(datos_libro, "Error: se encontró un libro con el ID ingresado")
+
+		
+
+
+
+	
