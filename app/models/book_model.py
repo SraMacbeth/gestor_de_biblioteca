@@ -1,5 +1,5 @@
 import sqlite3
-from models import db 
+from . import db 
 
 STATUS_AVAILABLE = "Disponible"
 STATUS_LOANED = "Prestado"

@@ -2,22 +2,26 @@ import sqlite3
 import os
 
 # Obtener la ruta absoluta de la carpeta 'app'
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+print(f"Directorio Base: {BASE_DIR}")
 
 def get_db_connection():
-    # Si estamos ejecutando tests, usamos la carpeta test_data que está fuera de app
-    if os.environ.get('TESTING') == 'True':
+	# Si estamos ejecutando tests, usamos la carpeta test_data que está fuera de app
+	if os.environ.get('TESTING') == 'True':
         # Subimos un nivel desde 'app' para encontrar 'test_data'
-        ROOT_DIR = os.path.dirname(BASE_DIR)
-        db_path = os.path.join(ROOT_DIR, "test_data", "test_library.db")
-    else:
-        # Ruta normal para la app real
-        db_path = os.path.join(BASE_DIR, "database", "library.db")
+		db_path = os.path.join(BASE_DIR, "test_data", "test_library.db")
+	else:
+		# Ruta normal para la app real
+		db_path = os.path.join(BASE_DIR, "app", "data", "library.db")
+		print(db_path)
     
     # Verificamos que la carpeta exista antes de conectar
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    
-    return sqlite3.connect(db_path)
+	os.makedirs(os.path.dirname(db_path), exist_ok=True)
+	
+	if os.environ.get('TESTING') == 'True' and "test_data" not in db_path:
+		raise Exception("¡ERROR DE SEGURIDAD! Se intentó conectar a una DB real en modo test.")
+	
+	return sqlite3.connect(db_path)
 
 def setup_database():
 	
@@ -30,7 +34,7 @@ def setup_database():
 		connection = get_db_connection()
 		cursor = connection.cursor()
 		
-		cursor.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);")
+		cursor.execute("CREATE TABLE IF NOT EXISTS user (user_id INTEGER PRIMARY KEY, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);")
 		
 		cursor.execute("CREATE TABLE IF NOT EXISTS author (author_id INTEGER PRIMARY KEY, first_name TEXT NOT NULL, last_name TEXT NOT NULL);")
 		
