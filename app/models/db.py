@@ -42,6 +42,66 @@ def setup_database():
 		
 		cursor.execute("CREATE TABLE IF NOT EXISTS genre (genre_id INTEGER PRIMARY KEY, name TEXT NOT NULL);")
 		
+		cursor.execute("SELECT COUNT(*) FROM genre")
+		count = cursor.fetchone()[0]
+        
+		if count == 0:
+            	
+			GENRES_TO_LOAD = [
+			# GÉNEROS DE NOVELA (Ficción)
+			("Fantasía",),
+			("Ciencia Ficción",),
+			("Cyberpunk",),
+			("Distopía",),
+			("Misterio",),
+			("Novela Psicológica",),
+			("Novela Negra / Policial",),
+			("Romance Histórico",),
+			("Romance Contemporáneo",),
+			("Terror",),
+			("Ficción Histórica",),
+			("Ficción Contemporánea",),
+			("Ficción Juvenil",),
+			("Aventura",),
+			("Western",),
+			("Sátira / Humor",),
+					
+			# NO FICCIÓN: CIENCIAS Y DISCIPLINAS
+			("Biografía / Autobiografía",),
+			("Ensayo",),
+			("Memoria",),
+			("Historia Antigua",),
+			("Historia Moderna",),
+			("Filosofía",),
+			("Psicología",),
+			("Sociología",),
+			("Economía",),
+			("Biología",),
+			("Física",),
+			("Matemáticas",),
+			("Medicina",),
+			("Divulgación científica",),
+			("Autoayuda / Desarrollo Personal",),
+			("Política",),
+			("Referencia (Diccionarios, etc.)",),
+			
+			# OTROS
+			("Poesía",),
+			("Teatro",),
+			("Cómic / Novela Gráfica",),
+			("Cuento Infantil",),
+			("Novela Infantil",),
+			("Viajes",),
+			("Crónicas",),
+			("Cocina / Gastronomía",),
+			("Arte",),
+			("Fotografía",),
+			("Tecnología",)
+			]
+				
+			insert_query = "INSERT INTO genre (name) VALUES (?)"
+			cursor.executemany(insert_query, GENRES_TO_LOAD)
+
 		cursor.execute("CREATE TABLE IF NOT EXISTS book (book_id INTEGER PRIMARY KEY, isbn TEXT NOT NULL, title TEXT NOT NULL, genre_id INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY (genre_id) REFERENCES genre(genre_id), FOREIGN KEY (user_id) REFERENCES user(user_id));")
 		
 		cursor.execute("CREATE TABLE IF NOT EXISTS book_author (book_id INTEGER, author_id INTEGER, FOREIGN KEY (book_id) REFERENCES book(book_id), FOREIGN KEY (author_id) REFERENCES author(author_id));")
