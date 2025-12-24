@@ -102,7 +102,7 @@ def setup_database():
 			insert_query = "INSERT INTO genre (name) VALUES (?)"
 			cursor.executemany(insert_query, GENRES_TO_LOAD)
 
-		cursor.execute("CREATE TABLE IF NOT EXISTS book (book_id INTEGER PRIMARY KEY, isbn TEXT NOT NULL, title TEXT NOT NULL, genre_id INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY (genre_id) REFERENCES genre(genre_id), FOREIGN KEY (user_id) REFERENCES user(user_id));")
+		cursor.execute("CREATE TABLE IF NOT EXISTS book (book_id INTEGER PRIMARY KEY, isbn TEXT NOT NULL, title TEXT NOT NULL, publisher TEXT NOT NULL, genre_id INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY (genre_id) REFERENCES genre(genre_id), FOREIGN KEY (user_id) REFERENCES user(user_id));")
 		
 		cursor.execute("CREATE TABLE IF NOT EXISTS book_author (book_id INTEGER, author_id INTEGER, FOREIGN KEY (book_id) REFERENCES book(book_id), FOREIGN KEY (author_id) REFERENCES author(author_id));")
 		
