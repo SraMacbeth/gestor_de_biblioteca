@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from controllers import book_controller
+from controllers import book_controller, genre_controller
 
 class BookForm(Toplevel):
 	
@@ -58,7 +58,7 @@ class BookForm(Toplevel):
 		
 		self.selected_genre = StringVar(value=self.genre)
 		
-		self.genre_selector = ttk.Combobox(container, textvariable=self.selected_genre, values=book_controller.list_genres(), state="readonly")
+		self.genre_selector = ttk.Combobox(container, textvariable=self.selected_genre, values=genre_controller.list_genres(), state="readonly")
 		self.genre_selector.grid(row=4, column=1, pady=10)
 
 		self.isbn_label = Label(container, text="ISBN:")
