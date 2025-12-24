@@ -7,7 +7,7 @@ STATUS_LOANED = "Prestado"
 class Book():
 	
 	def __init__(self, book_id, isbn, title, genre_id, user_id):
-		self_book_id = book_id
+		self.book_id = book_id
 		self.isbn = isbn
 		self.title = title
 		self.genre_id = genre_id
