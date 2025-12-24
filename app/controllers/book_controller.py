@@ -70,12 +70,3 @@ def add_book(title, authors, genre, isbn, publisher, copies, user_id):
 	else:
 		return {"estado": "ok", "mensaje":"Libro ingresado exitosamente."}
 
-def list_genres():
-	
-	""""
-	Crea una lista con todos los géneros precargados en la base de datos.
-	"""
-	
-	genres = Book.get_all_genres()
-	
-	return [row[0] for row in genres]
