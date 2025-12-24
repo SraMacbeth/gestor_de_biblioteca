@@ -6,12 +6,14 @@ STATUS_LOANED = "Prestado"
 
 class Book():
 	
-	def __init__(self, book_id, isbn, title, genre_id, user_id):
-		self.book_id = book_id
+	def __init__(self, book_id, isbn, title, publisher, genre_id, user_id, copies=0):
+		self.book_id = book_id 
 		self.isbn = isbn
 		self.title = title
+		self.publisher = publisher  
 		self.genre_id = genre_id
 		self.user_id = user_id
+		self.copies = copies
 		
 	@classmethod		
 	def get_book_by_id(cls, book_id):
@@ -27,7 +29,7 @@ class Book():
 				cursor = connection.cursor()
 								
 				#Obtener datos del libro segun su ID
-				cursor.execute("SELECT * FROM book WHERE book_id = ?;", (book_id, ))
+				cursor.execute("SELECT book_id, isbn, title, publisher, genre_id, user_id FROM book WHERE book_id = ?;", (book_id, ))
 				
 				book = cursor.fetchone()
 				
