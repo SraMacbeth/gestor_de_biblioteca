@@ -8,7 +8,7 @@ __pycache__/
 *.py[cod]
 
 # Base de datos
-app/db/*.db
+app/data/*.db
 
 # Archivos de sistema Mac
 .DS_Store
