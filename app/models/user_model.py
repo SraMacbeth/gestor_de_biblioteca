@@ -23,7 +23,7 @@ class User():
 		try:
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()			
-				cursor.execute("SELECT 1 FROM users WHERE email = ?", (email, ))
+				cursor.execute("SELECT 1 FROM user WHERE email = ?", (email, ))
 				return cursor.fetchone()
 			
 		except sqlite3.Error as e:
@@ -41,7 +41,7 @@ class User():
 		try:
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()			
-				cursor.execute("SELECT * FROM users WHERE email = ?", (email, ))
+				cursor.execute("SELECT * FROM user WHERE email = ?", (email, ))
 				return cursor.fetchone()
 			
 		except sqlite3.Error as e:
@@ -52,7 +52,7 @@ class User():
 		try:
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
-				cursor.execute("SELECT * FROM users")
+				cursor.execute("SELECT * FROM user")
 				return cursor.fetchone()
 		except sqlite3.Error as e:
 			print(e)
@@ -72,7 +72,7 @@ class User():
 		try:
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
-				cursor.execute("INSERT INTO users (first_name, last_name, email, password) VALUES(?, ?, ?, ?)", (firstName, lastName, email, password))
+				cursor.execute("INSERT INTO user (first_name, last_name, email, password) VALUES(?, ?, ?, ?)", (firstName, lastName, email, password))
 				connection.commit()
 		except sqlite3.Error as e:
 			print(e)
@@ -90,7 +90,7 @@ class User():
 		try:
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
-				cursor.execute("UPDATE users SET password = ? WHERE email = ?", (new_password, email))
+				cursor.execute("UPDATE user SET password = ? WHERE email = ?", (new_password, email))
 				connection.commit()
 		except sqlite3.Error as e:
 			print(e)
