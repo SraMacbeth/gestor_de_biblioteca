@@ -60,8 +60,8 @@ def add_book(title, authors, genre, isbn, publisher, copies, user_id):
 	Retorna diferentes mensajes en funcion de los casos
 	"""	
 	
-	if isbn == "" or title == "" or authors == "" or publisher == "" or genre == "" or user_id == "" or copies == "":
-		return {"estado": "error", "mensaje":"Los compos no pueden estar vacíos"}
+	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "" or user_id == "":
+		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos"}
 		
 	new_book = Book.add_book(title, authors, genre, isbn, publisher, copies, user_id)
 	
@@ -69,4 +69,3 @@ def add_book(title, authors, genre, isbn, publisher, copies, user_id):
 		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}
 	else:
 		return {"estado": "ok", "mensaje":"Libro ingresado exitosamente."}
-

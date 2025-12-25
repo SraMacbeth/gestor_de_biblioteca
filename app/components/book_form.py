@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from controllers import book_controller, genre_controller
 
 class BookForm(Toplevel):
@@ -83,13 +84,11 @@ class BookForm(Toplevel):
 		self.copies_entry.grid(row=7, column=1, pady=10)
 				
 		if type_form == "new_book_form":
-			self.add_new_book_button = Button(container, text="Agregar libro", command = lambda : self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),
-			int(self.copies_entry.get()), 1))
+			self.add_new_book_button = Button(container, text="Agregar libro", command = self.validate_and_save)
 			self.add_new_book_button.grid(row=8, column=0, columnspan=2, pady=20)
 
 		if type_form == "edit_book_form":
-			self.edit_book_buttton = Button(container, text="Editar libro", command = lambda : self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),
-			int(self.copies_entry.get()), 1))
+			self.edit_book_buttton = Button(container, text="Editar libro", command = self.validate_and_save)
 			self.edit_book_buttton.grid(row=8, column=0, columnspan=2, pady=20)
 
 		self.grid_rowconfigure(0, weight=1)
@@ -97,7 +96,30 @@ class BookForm(Toplevel):
 		self.grid_columnconfigure(0, weight=1)
 		self.grid_columnconfigure(1, weight=1)
 		self.grid_columnconfigure(2, weight=1)
-				
+	
+	def validate_and_save(self):
+
+		copies_number = self.copies_entry.get()
+		
+		if copies_number == "":
+			messagebox.showerror("Error", "El campo copias no puede estar vacio")
+			return None
+			
+		if not copies_number.isdigit():
+			messagebox.showerror("Error", "El campo copias solo acepta valores numericos.")
+			return None
+
+		try:
+			copies_int = int(copies_number)
+			if self.type_form == "new_book_form":
+				self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),copies_int, 1)
+			
+			if self.type_form =="edit_book_form":
+				self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(), copies_int, 1)
+		except ValueError as e:
+			messagebox.showerror("Error", "Error: El numero de copias ingresado es invalido.")
+			print(e)
+
 	def add_new_book(self, title, authors, genre, isbn, publisher, copies, user_id):
 		
 		result = book_controller.add_book(title, authors, genre, isbn, publisher, copies, user_id)
