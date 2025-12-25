@@ -19,7 +19,7 @@ class SearchResultContainer(Frame):
 
 		self.xscrollbar_treeview = ttk.Scrollbar(self, orient=HORIZONTAL)
 
-		self.treeview_columns = ("ID", "Título", "Autor", "ISBN", "Editorial", "Número de copias")
+		self.treeview_columns = ("ID", "Título", "Autor", "ISBN", "Editorial", "Status", "Número de copias")
 		
 		self.result_treeview = ttk.Treeview(self, columns=self.treeview_columns, show='headings', height=1, xscrollcommand=self.xscrollbar_treeview.set)
 		
@@ -46,6 +46,9 @@ class SearchResultContainer(Frame):
 
 		self.result_treeview.heading("Editorial", text="Editorial")
 		self.result_treeview.column("Editorial", width=130, minwidth=130, stretch=False, anchor="center")
+
+		self.result_treeview.heading("Status", text="Status") 
+		self.result_treeview.column("Status", width=50, minwidth=50, stretch=False, anchor="center")
 
 		self.result_treeview.heading("Número de copias", text="Stock") 
 		self.result_treeview.column("Número de copias", width=50, minwidth=50, stretch=False, anchor="center")

@@ -3,16 +3,20 @@ from . import db
 
 STATUS_AVAILABLE = "Disponible"
 STATUS_LOANED = "Prestado"
+INITIAL_STATUS = "Activo" 
+STATUS_REASON = "Alta"
 
 class Book():
 	
-	def __init__(self, book_id, isbn, title, publisher, genre_id, user_id, copies=0):
+	def __init__(self, book_id, isbn, title, publisher, genre_id, user_id, initial_status, status_reason, copies=0):
 		self.book_id = book_id 
 		self.isbn = isbn
 		self.title = title
 		self.publisher = publisher  
 		self.genre_id = genre_id
 		self.user_id = user_id
+		self.initial_status = initial_status
+		self.status_reason = status_reason
 		self.copies = copies
 		
 	@classmethod		
@@ -29,7 +33,7 @@ class Book():
 				cursor = connection.cursor()
 								
 				#Obtener datos del libro segun su ID
-				cursor.execute("SELECT book_id, isbn, title, publisher, genre_id, user_id FROM book WHERE book_id = ?;", (book_id, ))
+				cursor.execute("SELECT book_id, isbn, title, publisher, genre_id, user_id, initial_status, status_reason FROM book WHERE book_id = ?;", (book_id, ))
 				
 				book = cursor.fetchone()
 				
@@ -61,7 +65,7 @@ class Book():
 					
 					copies = cursor.fetchall()
 					
-					return book, author_name, genre_name, copies
+					return book, author_name, genre_name, copies,INITIAL_STATUS, STATUS_REASON
 				
 				else:
 					return book
@@ -70,7 +74,7 @@ class Book():
 			print(e)
 			
 	@classmethod
-	def add_book(cls, title, authors, genre, isbn, publisher, copies, user_id):
+	def add_book(cls, title, authors, genre, isbn, publisher, copies, initial_status, status_reason, user_id):
 		
 		"""
 		Inserta los datos de un nuevo libro en la base de datos
@@ -108,7 +112,7 @@ class Book():
 						genre_id = cursor.lastrowid
 						
 					#Insertar libro
-					cursor.execute("INSERT INTO book (isbn, title, publisher, genre_id, user_id) VALUES(?, ?, ?, ?, ?);", (isbn, title, publisher, genre_id, user_id))
+					cursor.execute("INSERT INTO book (isbn, title, publisher, genre_id, user_id, initial_status, status_reason) VALUES(?, ?, ?, ?, ?, ?, ?);", (isbn, title, publisher, genre_id, user_id, initial_status, status_reason))
 					book_id = cursor.lastrowid
 									
 					#Verificar / insertar autores y asociar tablas

@@ -69,8 +69,9 @@ class BooksView(BaseView):
 			isbn = data[5]
 			publisher = data[6]
 			stock = data[7]
+			status = data[8]
 	
-			treeview_values = [register_id, title, author_name, isbn, publisher, stock]
+			treeview_values = [register_id, title, author_name, isbn, publisher, status, stock]
 
 			self.search_result_container.result_treeview.insert(parent='', index='end', values=treeview_values)
 	
