@@ -126,6 +126,7 @@ class BookForm(Toplevel):
 				
 		if result["estado"] == "ok":
 			messagebox.showinfo("Exito", result["mensaje"])
+			self.grab_release()
 			self.destroy()
 		else:
 			messagebox.showerror("Error", result["mensaje"])
@@ -136,6 +137,7 @@ class BookForm(Toplevel):
 				
 		if result["estado"] == "ok":
 			messagebox.showinfo("Exito", result["mensaje"])
+			self.grab_release()
 			self.destroy()
 		else:
 			messagebox.showerror("Error", result["mensaje"])
