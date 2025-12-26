@@ -7,8 +7,10 @@ env/
 __pycache__/
 *.py[cod]
 
-# Base de datos
+# Bases de datos (App y Tests)
 app/data/*.db
+test_data/*.db
+*.db
 
 # Archivos de sistema Mac
 .DS_Store
