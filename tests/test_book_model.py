@@ -6,12 +6,12 @@ from . import test_db_setup
 from app.models.book_model import Book
 
 # Se definen constantes para los tests
-STATUS_AVAILABLE = "Disponible"
-STATUS_LOANED = "Prestado"
+STATUS_LOAN_AVAILABLE = "Disponible"
+STATUS_LOAN_LOANED = "Prestado"
+STATUS_LOAN_UNAVAILABLE = "No disponible"
+STATUS = "Activo" 
 TEST_ISBN ="9789500739718"
 TEST_USER_ID = 1
-INITIAL_STATUS = "Activo" 
-STATUS_REASON = "Alta"
 
 class TestBookModel(unittest.TestCase):
 		
@@ -53,17 +53,19 @@ class TestBookModel(unittest.TestCase):
 	def test_insercion_correcta(self):
 		"""Prueba que un nuevo libro se añade correctamente."""
 
-		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID, INITIAL_STATUS, STATUS_REASON]
+		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS,TEST_USER_ID]
 		
 		# Act: Intentamos insertar
 		exito = Book.add_book(*libro_a_agregar)
+
+		#Aseert
 		self.assertTrue(exito, "La inserción falló")
 
 	def test_buscar_por_id(self): 
 		'''Asegura que get_book_by_id devuelve exactamente lo que se espera'''
 		
 		# PREPARACIÓN: Insertar un libro manualmente para tener algo que buscar
-		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID, INITIAL_STATUS, STATUS_REASON]
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS, TEST_USER_ID]
 		Book.add_book(*libro_datos)
 
 		# Buscar el ID en la DB por el ISBN del libro
@@ -87,7 +89,7 @@ class TestBookModel(unittest.TestCase):
 		'''Asegura que si se busca un libro con un id inexistente devuelve el error'''
 		
 		# PREPARACIÓN: Insertar un libro manualmente para tener algo que buscar
-		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID, INITIAL_STATUS, STATUS_REASON]
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID, STATUS]
 		Book.add_book(*libro_datos)
 
 		# Buscar el ID del libro ingresado en la DB por el ISBN del libro
@@ -106,6 +108,41 @@ class TestBookModel(unittest.TestCase):
 		
 		# Assert
 		self.assertIsNone(datos_libro, "Error: se encontró un libro con el ID ingresado")
+		
+	def test_actualizar_libro(self):
+
+		"""Prueba que un libro existente se actualiza correctamente."""
+
+		# PREPARACIÓN: Insertar un libro manualmente para tener algo que actualizar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		print(Book.get_book_by_id(generated_id))
+
+		# Crear los nuevps datps del libro
+		nuevos_datos = [generated_id, "Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, "Inactivo", None, TEST_USER_ID]
+		
+		# Act
+		exito = Book.update_book(*nuevos_datos)
+
+		# Assert
+		self.assertTrue(exito, "La actualizacion fallo.")
+
+		# Verificar el libro actualizado por su estado		
+		libro_actualizado = Book.get_book_by_id(generated_id)
+		print(libro_actualizado)
+		self.assertEqual(libro_actualizado[0][6], "Inactivo", "El estado inicial no coincide")
+		
+		# Verificar que también ocurrió la consecuencia lógica (se modifico a "No disponible" el estado de las copias)
+		self.assertEqual(libro_actualizado[3][0][3], "No disponible")	
 		
 	# def test_eliminar_libro(self): 
 	# 	'''Verifica que al borrar un libro, también se borran sus copias (o se manejen las claves foráneas)'''
