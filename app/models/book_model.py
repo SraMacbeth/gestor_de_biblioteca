@@ -60,7 +60,7 @@ class Book():
 					author_name = cursor.fetchall()
 											
 					#Obtener cantidad de copias
-					cursor.execute("SELECT * FROM copy WHERE book_id = ?;", (book_id,))
+					cursor.execute("SELECT copy_id, copy_code, status_loan, unavailable_reason FROM copy WHERE book_id = ?;", (book_id,))
 					
 					copies = cursor.fetchall()
 					
@@ -132,7 +132,10 @@ class Book():
 												
 					#Insertar copias
 					for i in range(copies):
-						cursor.execute("INSERT INTO copy (book_id, isbn, status_loan, user_id) VALUES (?, ?, ?, ?)", (book_id, isbn, STATUS_LOAN_AVAILABLE, user_id))
+
+						copy_code = f"{isbn}-{i+1}"
+
+						cursor.execute("INSERT INTO copy (book_id, isbn, copy_code, status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
 						
 					connection.commit()
 					return True
@@ -232,7 +235,10 @@ class Book():
 						new_copies_to_insert = copies - actual_copies_number
 						
 						for _ in range(new_copies_to_insert):
-							cursor.execute("INSERT INTO copy (book_id, isbn, status_loan, user_id) VALUES (?, ?, ?, ?)", (book_id, isbn, STATUS_LOAN_AVAILABLE, user_id))
+							
+							copy_code = f"{isbn}-{actual_copies_number + _ + 1}"
+
+							cursor.execute("INSERT INTO copy (book_id, isbn, copy_code,status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
 							
 					elif copies < actual_copies_number:
 						
