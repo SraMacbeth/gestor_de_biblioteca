@@ -1,6 +1,8 @@
-from models.book_model import Book
-from models.book_model import INITIAL_STATUS, STATUS_REASON
+from models.book_model import Book, STATUS
 import re
+
+# TODO: Reemplazar por el ID del usuario logueado cuando el sistema de login esté conectado
+CURRENT_USER_ID = 1
 
 def is_id_valid(book_id):
 	
@@ -26,7 +28,7 @@ def search_book_by_id(book_id):
 		return {"estado": "error", "mensaje":"No existen libros registrados para el ID ingresado."}
 	else:
 		
-		book_items, author_name, genre_name, copies, initial_status, status_reason = book
+		book_items, author_name, genre_name, copies = book
 						
 		id_book = book_items[0]
 		
@@ -41,12 +43,14 @@ def search_book_by_id(book_id):
 		publisher = book_items[3]
 		
 		copies_number = len(copies)
+
+		status = book_items[6]
 		
-		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, copies_number, initial_status, status_reason]
+		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, copies_number, status]
 				
 		return {"estado": "ok", "mensaje":"Libro encontrado", "detalles" : book_details} 
 
-def add_book(title, authors, genre, isbn, publisher, copies, user_id, initial_status=INITIAL_STATUS, status_reason=STATUS_REASON):
+def add_book(title, authors, genre, isbn, publisher, copies):
 	
 	"""
 	agrega un nuevo libro en la base de datos
@@ -61,10 +65,10 @@ def add_book(title, authors, genre, isbn, publisher, copies, user_id, initial_st
 	Retorna diferentes mensajes en funcion de los casos
 	"""	
 	
-	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "" or user_id == "":
+	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "":
 		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos"}
 		
-	new_book = Book.add_book(title, authors, genre, isbn, publisher, copies, user_id, initial_status, status_reason)
+	new_book = Book.add_book(title, authors, genre, isbn, publisher, copies, status=STATUS,user_id=CURRENT_USER_ID)
 	
 	if new_book == False:
 		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}

@@ -112,10 +112,10 @@ class BookForm(Toplevel):
 		try:
 			copies_int = int(copies_number)
 			if self.type_form == "new_book_form":
-				self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),copies_int, 1)
+				self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),copies_int)
 			
 			if self.type_form =="edit_book_form":
-				self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(), copies_int, 1)
+				self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(), copies_int)
 		except ValueError as e:
 			messagebox.showerror("Error", "Error: El numero de copias ingresado es invalido.")
 			print(e)
