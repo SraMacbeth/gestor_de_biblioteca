@@ -29,6 +29,8 @@ def search_book_by_id(book_id):
 	else:
 		
 		book_items, author_name, genre_name, copies = book
+
+		total_copies = len(copies)
 						
 		id_book = book_items[0]
 		
@@ -42,11 +44,9 @@ def search_book_by_id(book_id):
 		
 		publisher = book_items[3]
 		
-		copies_number = len(copies)
-
 		status = book_items[6]
 		
-		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, copies_number, status]
+		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, total_copies, status,copies]
 				
 		return {"estado": "ok", "mensaje":"Libro encontrado", "detalles" : book_details} 
 
@@ -55,7 +55,7 @@ def add_book(title, authors, genre, isbn, publisher, copies):
 	"""
 	agrega un nuevo libro en la base de datos
 	Parametros: 
-	isbn(int) idstr) isbn del libro
+	isbn(int) isbn del libro
 	title(str) título del libro
 	authors(str) nombre y apellido de los autores
 	publisher(str) editorial
@@ -74,3 +74,31 @@ def add_book(title, authors, genre, isbn, publisher, copies):
 		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}
 	else:
 		return {"estado": "ok", "mensaje":"Libro ingresado exitosamente."}
+
+def update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason):
+
+	"""
+	actualiza un libro existente en la base de datos
+	Parametros: 
+	book_id (int) identificador del libro
+	title(str) título del libro
+	authors(str) nombre y apellido de los autores
+	genre(str) género al que pertenece el libro
+	isbn(int) isbn del libro
+	publisher(str) editorial
+	copies(str) cantidad de copias ingresadas
+	status (str) estado del libro en el inventario
+	unavailable_reason (str) motivo por el cual un libro no esta disponible para prestamo
+	user_id(int) id del usuario que ingresó el libro
+	Retorna diferentes mensajes en funcion de los casos
+	"""
+
+	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "" or status == "":
+		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos"}
+		
+	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
+	
+	if updated_book == False:
+		return {"estado": "error", "mensaje": updated_book[1]}
+	else:
+		return {"estado": "ok", "mensaje":updated_book[1]}

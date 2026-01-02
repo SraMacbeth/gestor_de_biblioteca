@@ -177,11 +177,11 @@ class Book():
 					loaned_copies_number = len(loaned_copies)
 
 					if loaned_copies_number > 0:
-						return False
+						return False, "No es posible inactivar un libro que posee copias prestadas. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones."
 				
 				# Un libro no debería figurar como "Activo" (disponible en el catálogo) si el usuario ha decidido que tiene cero copias operativas.
 				if status == "Activo" and copies == 0:
-					return False
+					return False, "No es posible asignar cero copias a un libro que se encuentra activo. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones."
 
 				#Extraer genre_id o ingresar un nuevo género si no existe
 				cursor.execute("SELECT genre_id FROM genre WHERE name = ?", (genre,))
@@ -249,18 +249,18 @@ class Book():
 						available_copies = cursor.fetchone()[0]
 						
 						if available_copies < copies_to_delete:
-							return False
+							return False, "No hay suficientes copias disponibles para eliminar. Revise la cantidad de copias ingresadas o gestione las mismas en la sección de Préstamos y Devoluciones."
 
 						# NO ELIMINAR LAS COPIAS SOLO PASARLAS A NO DISPONIBLE	
 						cursor.execute("UPDATE copy SET status_loan = ?, unavailable_reason = ? WHERE rowid IN (SELECT rowid FROM copy WHERE book_id = ? AND status_loan = 'Disponible' LIMIT ?)", (STATUS_LOAN_UNAVAILABLE, unavailable_reason, book_id, copies_to_delete))
 
 				connection.commit()
 
-				return True				
+				return True, "Libro actualizado correctamente"			
 
 		except sqlite3.Error as e:
 			print(f"\n--- ERROR DE SQLITE EN UPDATE_BOOK: {e} ---")	
-			return False	
+			return False, f"\n--- ERROR DE SQLITE EN UPDATE_BOOK: {e} ---"	
 
 	
 				 
