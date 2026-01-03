@@ -53,13 +53,28 @@ class TestBookModel(unittest.TestCase):
 	def test_insercion_correcta(self):
 		"""Prueba que un nuevo libro se añade correctamente."""
 
-		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS,TEST_USER_ID]
+		libro_a_agregar = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 3, STATUS,TEST_USER_ID]
 		
 		# Act: Intentamos insertar
 		exito = Book.add_book(*libro_a_agregar)
 
 		#Aseert
 		self.assertTrue(exito, "La inserción falló")
+
+		# Verificacion de codigos
+		# Buscar el ID del libro en la DB por su ISBN
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+		# Buscar el libro por su ID
+		inserted_book = Book.get_book_by_id(generated_id)
+		#Assert - Verificar que al insertar un libro con 3 copias, la base de datos realmente contenga los códigos ISBN-1, ISBN-2 e ISBN-3
+		self.assertEqual(inserted_book[3][0][1], "978-1-1", "978-1-1")
+		self.assertEqual(inserted_book[3][1][1], "978-1-2", "978-1-2")
+		self.assertEqual(inserted_book[3][2][1], "978-1-3", "978-1-3")
 
 	def test_buscar_por_id(self): 
 		'''Asegura que get_book_by_id devuelve exactamente lo que se espera'''
@@ -125,48 +140,83 @@ class TestBookModel(unittest.TestCase):
 		generated_id = row[0]
 		conn.close()
 
-		print(Book.get_book_by_id(generated_id))
-
-		# Crear los nuevps datps del libro
+		# Crear los nuevps datos del libro
 		nuevos_datos = [generated_id, "Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, "Inactivo", None, TEST_USER_ID]
 		
 		# Act
 		exito = Book.update_book(*nuevos_datos)
 
 		# Assert
-		self.assertTrue(exito, "La actualizacion fallo.")
+		self.assertTrue(exito[0], "La actualizacion fallo.")
 
 		# Verificar el libro actualizado por su estado		
 		libro_actualizado = Book.get_book_by_id(generated_id)
-		print(libro_actualizado)
 		self.assertEqual(libro_actualizado[0][6], "Inactivo", "El estado inicial no coincide")
 		
 		# Verificar que también ocurrió la consecuencia lógica (se modifico a "No disponible" el estado de las copias)
-		self.assertEqual(libro_actualizado[3][0][3], "No disponible")	
+		self.assertEqual(libro_actualizado[3][0][2], "No disponible")
+
+	def test_continuidad_codigos_actualizacion(self):
+
+		''' Asegura que al aumentar la cantidad de copias de un libro, los codigos de las nuevas copias mantienen la continuidad respecto de las copias existentes.'''
+
+		# PREPARACIÓN: Insertar un libro manualmente para tener algo que actualizar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 2, STATUS, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		# Act
+		nuevos_datos = [generated_id,"Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 4, STATUS, None, TEST_USER_ID]
+		Book.update_book(*nuevos_datos)
 		
-	# def test_eliminar_libro(self): 
-	# 	'''Verifica que al borrar un libro, también se borran sus copias (o se manejen las claves foráneas)'''
+		# Assert		
+		libro_actualizado = Book.get_book_by_id(generated_id)
 		
-	# 	# PREPARACIÓN: Insertar un libro manualmente para tener algo que eliminar
-	# 	libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, TEST_USER_ID]
-	# 	Book.add_book(*libro_datos)
+		# Verificar que ahora el total de copias sea 4
+		self.assertEqual(len(libro_actualizado[3]), 4, "El número total de copias no es 4")
 
-	# 	# Buscar el ID del libro ingresado en la DB por el ISBN del libro
-	# 	conn = test_db_setup.get_test_connection()
-	# 	cursor = conn.cursor()
-	# 	cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
-	# 	row = cursor.fetchone()
-	# 	generated_id = row[0]
-	# 	conn.close()
+		# Verificar la continuidad de los indices en los codigos de las nuevas copias
+		self.assertEqual(libro_actualizado[3][2][1], "978-1-3", "978-1-3")
 
-	# 	# Act
-	# 	datos_libro = Book.delete_b(generated_id)
-		
-	# 	# Assert
-	# 	self.assertIsNone(datos_libro, "Error: se encontró un libro con el ID ingresado")
-
-		
-
-
-
+		self.assertEqual(libro_actualizado[3][3][1], "978-1-4", "978-1-4")
 	
+	def test_validacion_de_integridad(self): 
+		
+		'''Confirma que el modelo devuelve False y su correspondiente mensaje de error, 
+		cuando se intenta pasar a "Inactivo" un libro que tiene al menos una copia con status_loan = 'Prestado'.'''
+
+		# PREPARACIÓN: 
+		
+		# Insertar un libro manualmente para tener algo que actualizar
+		libro_datos = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS, TEST_USER_ID]
+		Book.add_book(*libro_datos)
+
+		# Buscar el ID en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		# Cambiar manualmente el estado de una copia a "Prestado"
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("UPDATE copy SET status_loan = ?, unavailable_reason = ? WHERE rowid IN (SELECT rowid FROM copy WHERE book_id = ? AND status_loan = 'Disponible')", (STATUS_LOAN_LOANED, "Préstamo", generated_id))
+		conn.commit()
+
+		# Crear los nuevps datos del libro
+		nuevos_datos = [generated_id, "Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, "Inactivo", None, TEST_USER_ID]
+		
+		# Act
+		exito = Book.update_book(*nuevos_datos)
+
+		# Assert
+		self.assertFalse(exito[0], exito[1])
