@@ -1,28 +1,29 @@
-markdown
-BiblioApp
+# BiblioApp: Sistema de Gestión de Biblioteca
 
-Aplicación de escritorio para la gestión de bibliotecas públicas. Incluye gestión de usuarios administradores del sistema (registro, login y reseteo de contraseña), gestión de libros (ingreso de libros, consulta de ficha, edición de datos y eliminación de registros), alta y baja de socios y gestión de préstamos y devoluciones.
+*Aplicación de escritorio para la gestión de bibliotecas públicas.* 
 
-Características
-- Base de datos con SQLite
-- Interfaz gráfica con Tkinter
-- Arquitectura MVC
+*Incluye gestión de usuarios administradores del sistema (registro, login y reseteo de contraseña), gestión de libros (ingreso de libros, consulta de ficha, edición de datos y eliminación de registros), alta y baja de socios y gestión de préstamos y devoluciones.*
 
-Tecnologías utilizadas
-- Python 3.8
-- Tkinter
-- SQLite3
+# Características
+* Base de datos con SQLite
+* Interfaz gráfica con Tkinter
+* Arquitectura MVC
 
-Instalación
+# Tecnologías utilizadas
+* Python 3.8
+* Tkinter
+* SQLite3
+
+# Instalación
 1. Cloná el repositorio
 2. Creá el entorno virtual
 3. Instalá las dependencias
 
-Uso
-Ejecutá la app con:
-python main.py
+# Uso
+* Ejecutá la app con:
+python3 main.py
 
-Estructura del proyecto
+# Estructura del proyecto
 /components
 /controllers
 /db
@@ -34,6 +35,9 @@ main.py
 README.md
 requirements.txt
 
-Autor
+# Autor
 Emilia Poletti
+
+* NOTA:
+*"Este proyecto se encuentra en fase de MVP. Puedes consultar la hoja de ruta de futuras mejoras en el archivo TODO.md".*
 
