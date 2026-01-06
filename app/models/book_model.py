@@ -85,8 +85,7 @@ class Book():
 		genre(str) género al que pertenece el libro
 		user_id(int) id del usuario que ingresó el libro
 		copies(str) cantidad de copias ingresadas
-		initial_status(str) estado inicial del libro en el inventario
-		status_reason(str) motivo por el cual se produce el estado del libro en el inventario
+		status(str) estado del libro en el inventario
 		"""
 
 		try:
@@ -214,7 +213,7 @@ class Book():
 						
 					cursor.execute("INSERT INTO book_author (book_id, author_id) VALUES (?, ?)", (book_id, author_id))
 
-				# Si el usuario quiere pasar el libro a estado inacticvo, automaticamente todas sus copias se ponen como "No disponible"
+				# Si el usuario quiere pasar el libro a estado inactivo, automaticamente todas sus copias se ponen como "No disponible"
 				if status == "Inactivo":
 					cursor.execute("UPDATE copy set status_loan = ?, unavailable_reason = 'Libro Inactivado' WHERE book_id = ?", (STATUS_LOAN_UNAVAILABLE, book_id))
 				
