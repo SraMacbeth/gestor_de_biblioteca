@@ -183,9 +183,9 @@ class TestBookModel(unittest.TestCase):
 		self.assertEqual(len(libro_actualizado[3]), 4, "El número total de copias no es 4")
 
 		# Verificar la continuidad de los indices en los codigos de las nuevas copias
-		self.assertEqual(libro_actualizado[3][2][1], "978-1-3", "978-1-3")
+		self.assertEqual(libro_actualizado[3][2][1], "978-1-3", "El codigo de copia no es correcto")
 
-		self.assertEqual(libro_actualizado[3][3][1], "978-1-4", "978-1-4")
+		self.assertEqual(libro_actualizado[3][3][1], "978-1-4", "El codigo de copia no es correcto")
 	
 	def test_validacion_de_integridad(self): 
 		

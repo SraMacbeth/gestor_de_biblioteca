@@ -5,7 +5,7 @@
 *Tareas indispensables para que el módulo de libros sea funcional y seguro antes de pasar a otras entidades.*
 
 * [X] **Pruebas de Unidad (Modelo):** Finalizar los 3 tests básicos (Verificación de códigos, Integridad por préstamos y Continuidad de secuencia).
-* [ ] **Pruebas de Integración (Controlador):** Implementar los tests de búsqueda (formato de detalles) e inyección automática de `CURRENT_USER_ID`.
+* [X] **Pruebas de Integración (Controlador):** Implementar los tests de búsqueda (formato de detalles) e inyección automática de `CURRENT_USER_ID`.
 * [ ] **Borrado Lógico (Eliminar):** Implementar la función `delete_book` en las tres capas.
 * *Nota:* No usar `DELETE`, sino cambiar `status` a "Inactivo" para preservar la integridad referencial.
 

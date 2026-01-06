@@ -1,4 +1,4 @@
-from models.book_model import Book, STATUS
+from app.models.book_model import Book, STATUS
 import re
 
 # TODO: Reemplazar por el ID del usuario logueado cuando el sistema de login esté conectado
@@ -7,7 +7,7 @@ CURRENT_USER_ID = 1
 def is_id_valid(book_id):
 	
 	"""
-	Valida el formato del ID ingresado por el uuario
+	Valida el formato del ID ingresado por el usuario
 	Parametros: 
 	book_id(int) ID del libro buscado
 	Retorna True si el ID coincide con el patron establecido o False si no coincide
