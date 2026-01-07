@@ -120,9 +120,9 @@ class BookForm(Toplevel):
 			messagebox.showerror("Error", "Error: El numero de copias ingresado es invalido.")
 			print(e)
 
-	def add_new_book(self, title, authors, genre, isbn, publisher, copies, user_id):
+	def add_new_book(self, title, authors, genre, isbn, publisher, copies):
 		
-		result = book_controller.add_book(title, authors, genre, isbn, publisher, copies, user_id)
+		result = book_controller.add_book(title, authors, genre, isbn, publisher, copies)
 				
 		if result["estado"] == "ok":
 			messagebox.showinfo("Exito", result["mensaje"])
@@ -131,9 +131,9 @@ class BookForm(Toplevel):
 		else:
 			messagebox.showerror("Error", result["mensaje"])
 	
-	def update_book(self, book_id, title, authors, genre, isbn, publisher, new_copies_number, user_id):
+	def update_book(self, book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason):
 				
-		result = book_controller.update_book(book_id, title, authors, genre, isbn, publisher, new_copies_number, user_id)
+		result = book_controller.update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason)
 				
 		if result["estado"] == "ok":
 			messagebox.showinfo("Exito", result["mensaje"])
