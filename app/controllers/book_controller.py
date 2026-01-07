@@ -1,5 +1,9 @@
-from app.models.book_model import Book, STATUS
 import re
+
+try:
+	from app.models.book_model import Book, STATUS
+except ModuleNotFoundError as e:
+	from models.book_model import Book, STATUS
 
 # TODO: Reemplazar por el ID del usuario logueado cuando el sistema de login esté conectado
 CURRENT_USER_ID = 1
