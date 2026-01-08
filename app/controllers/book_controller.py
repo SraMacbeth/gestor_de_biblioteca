@@ -82,10 +82,10 @@ def add_book(title, authors, genre, isbn, publisher, copies):
 
 	new_book = Book.add_book(title, authors, genre, isbn, publisher, int_copies, status=STATUS,user_id=CURRENT_USER_ID)
 	
-	if new_book == False:
-		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}
+	if new_book[0] == False:
+		return {"estado": "error", "mensaje": new_book[1]}
 	else:
-		return {"estado": "ok", "mensaje":"Libro ingresado exitosamente."}
+		return {"estado": "ok", "mensaje": new_book[1]}
 
 def update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason):
 

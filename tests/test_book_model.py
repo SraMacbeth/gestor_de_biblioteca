@@ -220,3 +220,21 @@ class TestBookModel(unittest.TestCase):
 
 		# Assert
 		self.assertFalse(exito[0], exito[1])
+	
+	def test_validar_copia_mayor_a_cero(self):
+		
+		'''
+        Verifica que si el modelo recibe un 0 en el número de copias al agregar un libro, devuelve el mensaje de error esperado.
+        '''
+
+        # PREPARACIÓN:  
+        # Insertar un libro con 0 copias manualmente     
+		datos_libro = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 0, STATUS, TEST_USER_ID]
+		
+		# Act
+		exito = Book.add_book(*datos_libro)
+
+		# Assert
+		self.assertFalse(exito[0], exito[1])
+		
+

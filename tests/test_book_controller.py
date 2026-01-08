@@ -108,4 +108,22 @@ class TestBookController(unittest.TestCase):
 
         # Assert
         self.assertEqual(user_id_in_db, book_controller.CURRENT_USER_ID , "El ID de usuario no coincide")
+    
+    def test_validar_copia_mayor_a_cero(self):
+
+        '''
+        Verifica que si se envía un 0 en el número de copias al agregar un libro, el controlador devuelve el mensaje de error esperado.
+        '''
+
+        # PREPARACIÓN:  
+        # Insertar un libro con 0 copias manualmente     
+        datos_libro = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 0]
+
+        # Act    
+        exito = book_controller.add_book(*datos_libro)
+
+        # Assert
+        self.assertEqual(exito["estado"], "error")
+        self.assertEqual(exito["mensaje"], "El libro ingresado debe tener al menos una copia.")
+        
 

@@ -89,6 +89,10 @@ class Book():
 		"""
 
 		try:
+
+			if copies <= 0: 
+				return False, "El modelo requiere al menos una copia."
+
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
 				
@@ -96,7 +100,7 @@ class Book():
 				cursor.execute("SELECT * FROM book WHERE isbn = ?", (isbn,))
 				
 				if cursor.fetchone():
-					return False
+					return False, f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."
 					
 				else:
 
@@ -137,7 +141,7 @@ class Book():
 						cursor.execute("INSERT INTO copy (book_id, isbn, copy_code, status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
 						
 					connection.commit()
-					return True
+					return True, "Libro ingresado exitosamente."
 					
 		except sqlite3.Error as e:
 			print(f"\n--- ERROR DE SQLITE EN ADD_BOOK: {e} ---")	
