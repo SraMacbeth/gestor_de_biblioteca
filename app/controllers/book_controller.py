@@ -70,9 +70,17 @@ def add_book(title, authors, genre, isbn, publisher, copies):
 	"""	
 	
 	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "":
-		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos"}
-		
-	new_book = Book.add_book(title, authors, genre, isbn, publisher, copies, status=STATUS,user_id=CURRENT_USER_ID)
+		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos."}
+
+	try:
+		int_copies = int(copies)
+	except ValueError:
+		return {"estado": "error", "mensaje":"El campo copias solo acepta valores numéricos."}
+
+	if int_copies <= 0:
+		return {"estado": "error", "mensaje":"El libro ingresado debe tener al menos una copia."}
+
+	new_book = Book.add_book(title, authors, genre, isbn, publisher, int_copies, status=STATUS,user_id=CURRENT_USER_ID)
 	
 	if new_book == False:
 		return {"estado": "error", "mensaje": f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."}
