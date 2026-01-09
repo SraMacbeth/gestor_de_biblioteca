@@ -168,6 +168,15 @@ class Book():
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
 
+				#  Validacion previa a la actualizacion para verificar para que no se edite el libro si el ISBN ingresando pertenece a otro libro.
+
+				cursor.execute("SELECT * FROM book WHERE isbn = ? AND book_id != ?")
+
+				row = cursor.fetchone()
+
+				if row:
+					return False, "El ISBN ingresado ya pertenece a otro libro.".
+
 				# Validacion previa a la actualizacion para verificar el estado de las copias del libro antes de intentar pasarlo a Inactivo. 
 				# Regla de integridad: un libro no puede estar inactivo si tiene copias prestadas
 				if status == "Inactivo":
