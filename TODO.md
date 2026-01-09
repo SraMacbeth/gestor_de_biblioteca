@@ -51,6 +51,8 @@
 
 * [ ] **Manejo de Errores en UI:** Asegurar que todos los mensajes de error del controlador se muestren en `messagebox` de Tkinter.
 
+* [ ] **Estandarización de Flujo de Ventanas:** Asegurar que los formularios permanezcan abiertos ante errores de validación y solo se cierren tras una confirmación de éxito ("ok").
+
 ## 🔵 Fase 4: Versión Mejorada (Post-MVP / Futuro)
 
 *Ideas para cuando el sistema base esté funcionando al 100%.*

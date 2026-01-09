@@ -3,7 +3,6 @@ import os
 
 # Obtener la ruta absoluta de la carpeta 'app'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-print(f"Directorio Base: {BASE_DIR}")
 
 def get_db_connection():
 	# Si estamos ejecutando tests, usamos la carpeta test_data que está fuera de app
