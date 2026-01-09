@@ -110,7 +110,7 @@ def update_book(book_id, title, authors, genre, isbn, publisher, copies, status,
 		
 	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
 	
-	if updated_book == False:
+	if updated_book[0] == False:
 		return {"estado": "error", "mensaje": updated_book[1]}
 	else:
 		return {"estado": "ok", "mensaje":updated_book[1]}
