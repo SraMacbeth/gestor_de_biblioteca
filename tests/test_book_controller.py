@@ -50,7 +50,7 @@ class TestBookController(unittest.TestCase):
         pass
     
     def test_estructura_de_busqueda(self):
-        ''' Verifica que search_book_by_id devuelva un diccionario donde detalles[9] es efectivamente una lista de tuplas con las copias.'''
+        ''' Verifica que search_book_by_id devuelva un diccionario donde detalles[8] es efectivamente una lista de tuplas con las copias.'''
 
         # PREPARACIÓN:  
         # Insertar un libro manualmente para tener algo que buscar
@@ -76,9 +76,9 @@ class TestBookController(unittest.TestCase):
 
         # Act
         book = book_controller.search_book_by_id(generated_id)
-
+    
         #Assert
-        self.assertEqual(book['detalles'][9], copy_list, "La estructura de datos devuelta no es la esperada.")
+        self.assertEqual(book['detalles'][8], copy_list, "La estructura de datos devuelta no es la esperada.")
 
     def test_inyeccion_de_usuario(self):
         '''Comprueba que al llamar a add_book desde el controlador, no se necesita pasar el ID de usuario, pero que en la base de datos el registro aparece con el ID 1 (CURRENT_USER_ID)'''
