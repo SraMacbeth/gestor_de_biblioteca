@@ -8,11 +8,11 @@
 
 * [X] **Pruebas de Integración (Controlador):** Implementar los tests de búsqueda (formato de detalles) e inyección automática de `CURRENT_USER_ID`.
 
+* [ ] **Gestión de Ciclo de Vida:** Implementar reactivación de libros (Inactivo -> Activo) y sincronización de copias en update_book.
+
 * [ ] **Vista de Actualización:** * [ ] Crear el formulario que se autopueble al buscar un libro.
 * [ ] Integrar el `ttk.Treeview` para visualizar la lista de copias únicas y sus estados.
 
-* [ ] **Borrado Lógico (Eliminar):** Implementar la función `delete_book` en las tres capas.
-* *Nota:* No usar `DELETE`, sino cambiar `status` a "Inactivo" para preservar la integridad referencial.
 
 * [ ] **Gran Refactor de Libros:** Limpieza de código, eliminación de comentarios obsoletos y estandarización de nombres de variables en el CRUD de libros.
 
