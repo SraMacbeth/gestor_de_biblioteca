@@ -49,8 +49,16 @@ def search_book_by_id(book_id):
 		publisher = book_items[3]
 		
 		status = book_items[6]
-		
-		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, total_copies, status,copies]
+
+		total_copies = len(copies)
+
+		available_copies = 0
+
+		for i in copies:
+			if i[2] == "Disponible":
+				available_copies += 1
+
+		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, status,copies, total_copies, available_copies]
 				
 		return {"estado": "ok", "mensaje":"Libro encontrado", "detalles" : book_details} 
 
@@ -107,8 +115,16 @@ def update_book(book_id, title, authors, genre, isbn, publisher, copies, status,
 
 	if title == "" or authors[0][0] == "" or authors[0][1] == "" or genre == "" or isbn == "" or publisher == "" or copies == "" or status == "":
 		return {"estado": "error", "mensaje":"Los campos no pueden estar vacíos"}
-		
-	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
+	
+	try:
+		int_copies = int(copies)
+	except ValueError:
+		return {"estado": "error", "mensaje":"El campo copias solo acepta valores numéricos."}
+
+	if int_copies < 0:
+		return {"estado": "error", "mensaje":"La cantidad de copias a añadir debe ser un número positivo o 0 si no desea añadir copias."}
+
+	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, int_copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
 	
 	if updated_book[0] == False:
 		return {"estado": "error", "mensaje": updated_book[1]}
