@@ -178,6 +178,8 @@ class TestBookModel(unittest.TestCase):
 		
 		# Assert		
 		libro_actualizado = Book.get_book_by_id(generated_id)
+
+		print(libro_actualizado)
 		
 		# Verificar que ahora el total de copias sea 4
 		self.assertEqual(len(libro_actualizado[3]), 4, "El número total de copias no es 4")
@@ -236,5 +238,48 @@ class TestBookModel(unittest.TestCase):
 
 		# Assert
 		self.assertFalse(exito[0], exito[1])
-		
+	
+	def test_de_reactivacion(self):
+
+		'''
+        Verifica que si un libro pasa de estado "Inactivo" a "Activo" todas sus copias se vuelven disponibles y se resetea el unavailable_reason.
+        '''
+
+        # PREPARACIÓN:  
+        # Insertar un libro inactivo con copias no disponibles
+		datos_libro = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, "Inactivo", TEST_USER_ID]
+		Book.add_book(*datos_libro)
+
+		# Buscar el ID en la DB por el ISBN del libro
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("978-1",))
+		row = cursor.fetchone()
+		generated_id = row[0]
+		conn.close()
+
+		# Cambiar manualmente el estado de una copia a "No disponible"
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("UPDATE copy SET status_loan = ?, unavailable_reason = ? WHERE rowid IN (SELECT rowid FROM copy WHERE book_id = ? AND status_loan = 'Disponible')", (STATUS_LOAN_UNAVAILABLE, "Libro Inactivado", generated_id))
+		conn.commit()
+		conn.close()	
+
+		# Act
+		nuevos_datos = [generated_id,"Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1, STATUS, None, TEST_USER_ID]
+		Book.update_book(*nuevos_datos)
+
+		# Extraer el status_loan y el unavailabre_reason del libro luego de la actualizacion
+		conn = test_db_setup.get_test_connection()
+		cursor = conn.cursor()
+		cursor.execute("SELECT status_loan, unavailable_reason FROM copy WHERE book_id = ?", (generated_id,))
+		row = cursor.fetchone()
+		conn.close()
+
+		#Assert
+		self.assertEqual(row[0], "Disponible", "El libro no se encuentra disponible")
+		self.assertEqual(row[1], None, "El libro tiene una observacion")
+
+
+
 

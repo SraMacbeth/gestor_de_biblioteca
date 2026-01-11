@@ -193,7 +193,19 @@ class Book():
 				
 				# Un libro no debería figurar como "Activo" (disponible en el catálogo) si el usuario ha decidido que tiene cero copias operativas.
 				if status == "Activo" and copies == 0:
-					return False, "No es posible asignar cero copias a un libro que se encuentra activo. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones."
+				 	return False, "No es posible asignar cero copias a un libro que se encuentra activo. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones."
+				
+				# Activar un libro que se encuentra Inactivo
+				# Se consulta el estado actual del libro
+				cursor.execute("SELECT status FROM book WHERE book_id = ?", (book_id,))
+
+				row = cursor.fetchone()
+
+				actual_status = row[0]
+
+				if status == "Activo" and actual_status == "Inactivo":
+					# Automaticamente todas sus copias se ponen como "Disponible" y se limpia el valor de unavailable_reason
+					cursor.execute("UPDATE copy set status_loan = ?, unavailable_reason = ? WHERE book_id = ?", (STATUS_LOAN_AVAILABLE, None, book_id))
 
 				#Extraer genre_id o ingresar un nuevo género si no existe
 				cursor.execute("SELECT genre_id FROM genre WHERE name = ?", (genre,))
@@ -229,42 +241,42 @@ class Book():
 				# Si el usuario quiere pasar el libro a estado inactivo, automaticamente todas sus copias se ponen como "No disponible"
 				if status == "Inactivo":
 					cursor.execute("UPDATE copy set status_loan = ?, unavailable_reason = 'Libro Inactivado' WHERE book_id = ?", (STATUS_LOAN_UNAVAILABLE, book_id))
-				
+
 				# De lo contrario, las copias se gestionan de manera independiente segun la cantidad que desee ajustar el usuario
 				else:
 					#Obtener cantidad de copias y actualizarlas
-					cursor.execute("SELECT * FROM copy WHERE book_id = ?;", (book_id,))
-					actual_copies = cursor.fetchall()
+				 	cursor.execute("SELECT * FROM copy WHERE book_id = ?;", (book_id,))
+				 	actual_copies = cursor.fetchall()
 								
-					actual_copies_number = len(actual_copies)
+				 	actual_copies_number = len(actual_copies)
 				
-					if copies ==	actual_copies_number:
+				 	if copies ==	actual_copies_number:
 						
-						pass
+				 		pass
 						
-					elif copies > actual_copies_number:
+				 	elif copies > actual_copies_number:
 						
-						new_copies_to_insert = copies - actual_copies_number
+				 		new_copies_to_insert = copies - actual_copies_number
 						
-						for _ in range(new_copies_to_insert):
+				 		for _ in range(new_copies_to_insert):
 							
-							copy_code = f"{isbn}-{actual_copies_number + _ + 1}"
+				 			copy_code = f"{isbn}-{actual_copies_number + _ + 1}"
 
-							cursor.execute("INSERT INTO copy (book_id, isbn, copy_code,status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
+				 			cursor.execute("INSERT INTO copy (book_id, isbn, copy_code,status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
 							
-					elif copies < actual_copies_number:
+				 	elif copies < actual_copies_number:
 						
-						copies_to_delete = actual_copies_number - copies
+				 		copies_to_delete = actual_copies_number - copies
 						
-						cursor.execute("SELECT COUNT(*) FROM copy WHERE book_id = ? AND status_loan = ?;", (book_id, STATUS_LOAN_AVAILABLE))
+				 		cursor.execute("SELECT COUNT(*) FROM copy WHERE book_id = ? AND status_loan = ?;", (book_id, STATUS_LOAN_AVAILABLE))
 						
-						available_copies = cursor.fetchone()[0]
+				 		available_copies = cursor.fetchone()[0]
 						
-						if available_copies < copies_to_delete:
-							return False, "No hay suficientes copias disponibles para eliminar. Revise la cantidad de copias ingresadas o gestione las mismas en la sección de Préstamos y Devoluciones."
+				 		if available_copies < copies_to_delete:
+				 			return False, "No hay suficientes copias disponibles para eliminar. Revise la cantidad de copias ingresadas o gestione las mismas en la sección de Préstamos y Devoluciones."
 
-						# NO ELIMINAR LAS COPIAS SOLO PASARLAS A NO DISPONIBLE	
-						cursor.execute("UPDATE copy SET status_loan = ?, unavailable_reason = ? WHERE rowid IN (SELECT rowid FROM copy WHERE book_id = ? AND status_loan = 'Disponible' LIMIT ?)", (STATUS_LOAN_UNAVAILABLE, unavailable_reason, book_id, copies_to_delete))
+				 		# NO ELIMINAR LAS COPIAS SOLO PASARLAS A NO DISPONIBLE	
+				 		cursor.execute("UPDATE copy SET status_loan = ?, unavailable_reason = ? WHERE rowid IN (SELECT rowid FROM copy WHERE book_id = ? AND status_loan = 'Disponible' LIMIT ?)", (STATUS_LOAN_UNAVAILABLE, unavailable_reason, book_id, copies_to_delete))
 
 				connection.commit()
 
