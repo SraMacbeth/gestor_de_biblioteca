@@ -71,8 +71,15 @@ class TestBookController(unittest.TestCase):
         conn = test_db_setup.get_test_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT copy_id, copy_code, status_loan, unavailable_reason FROM copy WHERE book_id = ?;", (generated_id,))
-        copy_list = cursor.fetchall()
+        copy_tuple = cursor.fetchall()
         conn.commit()
+
+        copy_list = []
+        for i in copy_tuple:
+            list_i = list(i)
+            if list_i[3] == None:
+                list_i[3] = "---"
+            copy_list.append(list_i)
 
         # Act
         book = book_controller.search_book_by_id(generated_id)

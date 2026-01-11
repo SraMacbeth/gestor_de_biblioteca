@@ -178,8 +178,6 @@ class TestBookModel(unittest.TestCase):
 		
 		# Assert		
 		libro_actualizado = Book.get_book_by_id(generated_id)
-
-		print(libro_actualizado)
 		
 		# Verificar que ahora el total de copias sea 6
 		self.assertEqual(len(libro_actualizado[3]), 6, "El número total de copias no es 4")
