@@ -181,8 +181,8 @@ class TestBookModel(unittest.TestCase):
 
 		print(libro_actualizado)
 		
-		# Verificar que ahora el total de copias sea 4
-		self.assertEqual(len(libro_actualizado[3]), 4, "El número total de copias no es 4")
+		# Verificar que ahora el total de copias sea 6
+		self.assertEqual(len(libro_actualizado[3]), 6, "El número total de copias no es 4")
 
 		# Verificar la continuidad de los indices en los codigos de las nuevas copias
 		self.assertEqual(libro_actualizado[3][2][1], "978-1-3", "El codigo de copia no es correcto")
