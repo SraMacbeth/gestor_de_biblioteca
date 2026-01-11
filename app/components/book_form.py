@@ -6,9 +6,9 @@ from controllers import book_controller, genre_controller
 class BookForm(Toplevel):
 	
 	"""
-	Formulario que permite cargar un nuevo libro.	
+	Formulario que permite cargar o editar un libro.	
 	"""	
-	def __init__(self, form_title, parent, controller, type_form="", book_id="", user=None, book_title="", author_firstname="", author_lastname="", genre="", isbn="", publisher="", copies=""):
+	def __init__(self, form_title, parent, controller, type_form="", book_id="", user=None, book_title="", author_firstname="", author_lastname="", genre="", isbn="", publisher="", copies_data="", status=""):
 		super().__init__(parent)
 		self.form_title = form_title
 		self.controller = controller
@@ -21,75 +21,129 @@ class BookForm(Toplevel):
 		self.genre = genre
 		self.isbn = isbn 
 		self.publisher = publisher 
-		self.copies = copies
+		self.copies_data = copies_data
+		self.status = status
 		
 		self.title(self.form_title)
-		self.geometry("500x500")
+		#self.geometry("500x500")
 		self.resizable(False, False)
 		
 		container = Frame(self)
-		container.grid(row=0, column=1, padx=10, pady=10)
+		container.grid(row=0, column=1, padx=20, pady=20)
 		
 		self.title_label = Label(container, text=self.form_title, font=(None, 18, "bold"))
 		self.title_label.grid(row=0, column=0, columnspan=2, pady=10, sticky="nsew")
 
 		self.book_title_label = Label(container, text="Título:")
-		self.book_title_label.grid(row=1, column=0, pady=10)
+		self.book_title_label.grid(row=1, column=0, pady=10, sticky="w")
 
 		self.book_title_entry = Entry(container)
 		self.book_title_entry.insert(0, self.book_title)
-		self.book_title_entry.grid(row=1, column=1, pady=10)
+		self.book_title_entry.grid(row=1, column=1, pady=10, sticky="w")
 		
 		self.first_name_author_label = Label(container, text="Nombre del autor:")
-		self.first_name_author_label.grid(row=2, column=0, pady=10)
+		self.first_name_author_label.grid(row=2, column=0, pady=10, sticky="w")
 
 		self.first_name_author_entry = Entry(container)
 		self.first_name_author_entry.insert(0, self.author_firstname)
-		self.first_name_author_entry.grid(row=2, column=1, pady=10)
+		self.first_name_author_entry.grid(row=2, column=1, pady=10, sticky="w")
 		
 		self.last_name_author_label = Label(container, text="Apellido del autor:")
-		self.last_name_author_label.grid(row=3, column=0, pady=10)
+		self.last_name_author_label.grid(row=3, column=0, pady=10,sticky="w")
 
 		self.last_name_author_entry = Entry(container)
 		self.last_name_author_entry.insert(0, self.author_lastname)
-		self.last_name_author_entry.grid(row=3, column=1, pady=10)
+		self.last_name_author_entry.grid(row=3, column=1, pady=10, sticky="w")
 
 		self.genre_label = Label(container, text="Género:")
-		self.genre_label.grid(row=4, column=0, pady=10)
+		self.genre_label.grid(row=4, column=0, pady=10, sticky="w")
 		
 		self.selected_genre = StringVar(value=self.genre)
 		
 		self.genre_selector = ttk.Combobox(container, textvariable=self.selected_genre, values=genre_controller.list_genres(), state="readonly")
-		self.genre_selector.grid(row=4, column=1, pady=10)
+		self.genre_selector.set(self.genre)
+		self.genre_selector.grid(row=4, column=1, pady=10, sticky="w")
 
 		self.isbn_label = Label(container, text="ISBN:")
-		self.isbn_label.grid(row=5, column=0, pady=10)
+		self.isbn_label.grid(row=5, column=0, pady=10, sticky="w")
 		
 		self.isbn_entry = Entry(container)
 		self.isbn_entry.insert(0, self.isbn)
-		self.isbn_entry.grid(row=5, column=1, pady=10)
+		self.isbn_entry.grid(row=5, column=1, pady=10, sticky="w")
 
 		self.publisher_label = Label(container, text="Editorial:")
-		self.publisher_label.grid(row=6, column=0, pady=10)
+		self.publisher_label.grid(row=6, column=0, pady=10, sticky="w")
 		
 		self.publisher_entry = Entry(container)
 		self.publisher_entry.insert(0, self.publisher)
-		self.publisher_entry.grid(row=6, column=1, pady=10)
-		
-		self.copies_label = Label(container, text="Número de copias:")
-		self.copies_label.grid(row=7, column=0, pady=10)
-		
-		self.copies_entry = Entry(container)
-		self.copies_entry.insert(0, self.copies)
-		self.copies_entry.grid(row=7, column=1, pady=10)
+		self.publisher_entry.grid(row=6, column=1, pady=10, sticky="w")
 				
 		if type_form == "new_book_form":
+
+			self.copies_label = Label(container, text="Número de copias:")
+			self.copies_label.grid(row=7, column=0, pady=10, sticky="w")
+		
+			self.copies_entry = Entry(container)
+			self.copies_entry.insert(0, self.copies_data)
+			self.copies_entry.grid(row=7, column=1, pady=10, sticky="w")	
+
 			self.add_new_book_button = Button(container, text="Agregar libro", command = self.validate_and_save)
 			self.add_new_book_button.grid(row=8, column=0, columnspan=2, pady=20)
 
 		if type_form == "edit_book_form":
+
+			self.status_label = Label(container, text="Estado:")
+			self.status_label.grid(row=7, column=0, pady=10, sticky="w")
+
+			self.selected_status = StringVar(value=self.status)
+		
+			self.status_selector = ttk.Combobox(container, textvariable=self.selected_status, values=["Activo", "Inactivo"], state="readonly")
+			self.status_selector.set(self.status)
+			self.status_selector.grid(row=7, column=1, pady=10, sticky="w")
+
+			self.copies_label = Label(container, text="Copias a añadir:")
+			self.copies_label.grid(row=8, column=0, pady=10, sticky="w")
+		
+			self.copies_entry = Entry(container)
+			self.copies_entry.insert(0, 0)
+			self.copies_entry.grid(row=8, column=1, pady=10, sticky="w")
+
+			self.xscrollbar_treeview = ttk.Scrollbar(container, orient=HORIZONTAL)
+
+			self.treeview_columns = ("ID", "Código", "Estado", "Observaciones")
+		
+			self.copies_treeview = ttk.Treeview(container, columns=self.treeview_columns, show='headings', height=1, xscrollcommand=self.xscrollbar_treeview.set)
+			
+			self.xscrollbar_treeview.config(command=self.copies_treeview.xview)
+			
+			self.copies_treeview.bind('<Button-1>', self.block_resizing, add='+')
+			
+			self.copies_treeview.grid(row=9, column=0, columnspan=2, sticky="w")
+			
+			self.copies_treeview.heading("ID", text="ID")
+			self.copies_treeview.column("ID", width=0, minwidth=50, stretch=False, anchor="center")
+			
+			self.copies_treeview.heading("Código", text="Código")
+			self.copies_treeview.column("Código", width=230, minwidth=230, stretch=False, anchor="center")
+
+			self.copies_treeview.heading("Estado", text="Estado")
+			self.copies_treeview.column("Estado", width=120, minwidth=120, stretch=False, anchor="center")
+
+			self.copies_treeview.heading("Observaciones", text="Observaciones")
+			self.copies_treeview.column("Observaciones", width=120, minwidth=120, stretch=False, anchor="center")
+
+			self.existing_copies = self.copies_data
+
+			treeview_values = [row for row in self.existing_copies] if self.existing_copies else []
+			
+			total_filas = len(treeview_values)
+			self.copies_treeview.config(height=max(1, total_filas))
+			
+			for i in treeview_values:
+				self.copies_treeview.insert(parent='', index='end', values=i)
+
 			self.edit_book_buttton = Button(container, text="Editar libro", command = self.validate_and_save)
-			self.edit_book_buttton.grid(row=8, column=0, columnspan=2, pady=20)
+			self.edit_book_buttton.grid(row=10, column=0, columnspan=2, pady=20)
 
 		self.grid_rowconfigure(0, weight=1)
 
@@ -97,29 +151,17 @@ class BookForm(Toplevel):
 		self.grid_columnconfigure(1, weight=1)
 		self.grid_columnconfigure(2, weight=1)
 	
+	def block_resizing(self, event):
+		return "break"
+
 	def validate_and_save(self):
-
-		copies_number = self.copies_entry.get()
 		
-		if copies_number == "":
-			messagebox.showerror("Error", "El campo copias no puede estar vacio")
-			return None
+		if self.type_form == "new_book_form":
+			self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),self.copies_entry.get())
 			
-		if not copies_number.isdigit():
-			messagebox.showerror("Error", "El campo copias solo acepta valores numericos.")
-			return None
-
-		try:
-			copies_int = int(copies_number)
-			if self.type_form == "new_book_form":
-				self.add_new_book(self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(),copies_int)
-			
-			if self.type_form =="edit_book_form":
-				self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(), copies_int)
-		except ValueError as e:
-			messagebox.showerror("Error", "Error: El numero de copias ingresado es invalido.")
-			print(e)
-
+		if self.type_form =="edit_book_form":
+			self.update_book(self.book_id, self.book_title_entry.get(), [(self.first_name_author_entry.get(), self.last_name_author_entry.get())], self.selected_genre.get(), self.isbn_entry.get(), self.publisher_entry.get(), self.copies_entry.get(), self.selected_status.get(), None)
+		
 	def add_new_book(self, title, authors, genre, isbn, publisher, copies):
 		
 		result = book_controller.add_book(title, authors, genre, isbn, publisher, copies)

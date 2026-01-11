@@ -24,7 +24,7 @@ class BooksView(BaseView):
 		self.action_button_container.grid(row=1, column=1, sticky="s", padx=5)
 		self.action_button_container.grid_remove()
 		
-		self.edit_button = Button(self.action_button_container, text="✎", font=(None, 15, "bold"), fg="green", command=self.edit_book, state=DISABLED)
+		self.edit_button = Button(self.action_button_container, text="✎", font=(None, 15, "bold"), fg="green", command=self.open_edit_book_form, state=DISABLED)
 		self.edit_button.grid(row=0, column=0, padx=5)
 		
 		self.delete_button = Button(self.action_button_container, text="X", font=(None, 15, "bold"), fg="red", command=self.delete_book, state=DISABLED)
@@ -60,7 +60,7 @@ class BooksView(BaseView):
 		if result["estado"] == "ok":
 
 			data = result["detalles"]
-						
+
 			register_id = data[0]
 			title = data[1]
 			author_firstname = data[2]
@@ -68,10 +68,11 @@ class BooksView(BaseView):
 			author_name = f"{author_firstname} {author_lastname}"
 			isbn = data[5]
 			publisher = data[6]
-			stock = data[7]
-			status = data[8]
-	
-			treeview_values = [register_id, title, author_name, isbn, publisher, status, stock]
+			status = data[7]
+			total_copies = data[9]
+			available_copies = data[10]
+
+			treeview_values = [register_id, title, author_name, isbn, publisher, status, total_copies, available_copies]
 
 			self.search_result_container.result_treeview.insert(parent='', index='end', values=treeview_values)
 	
@@ -89,13 +90,6 @@ class BooksView(BaseView):
 			self.clean_entries(self.search_bar.search_bar_entry)
 			self.search_result_container.result_label.config(text=result["mensaje"], font=(None, 10, "bold"), fg="red", anchor="w")
 			self.search_result_container.result_label.grid(row=1, column=0, pady=10, sticky="ew")
-	
-	def edit_book(self):
-		"""
-		Función de marcador para la edición.
-		TODO: Implementar la lógica de edición. 
-		"""
-		print("Funcionalidad de edición pendiente.")
 		
 	def delete_book(self):
 		"""
@@ -113,3 +107,20 @@ class BooksView(BaseView):
 		new_book_form.grab_set()
 		
 		self.wait_window(new_book_form)
+
+	def open_edit_book_form(self):
+		
+		book_id = self.search_bar.get_search_text()
+		
+		result = book_controller.search_book_by_id(book_id)
+				
+		if result["estado"] == "ok":
+			id_book, title,author_firstname, author_lastname, genre, isbn, publisher, status, copies_data, total_copies, available_copies = result["detalles"]
+		
+		edit_book_form = BookForm("Editar libro", parent=self, controller=self, type_form="edit_book_form", book_id=book_id, book_title=title, author_firstname=author_firstname, author_lastname=author_lastname, genre=genre, isbn=isbn, publisher=publisher, status=status, copies_data=copies_data)
+		
+		edit_book_form.transient(self)
+		
+		edit_book_form.grab_set()
+		
+		self.wait_window(edit_book_form)

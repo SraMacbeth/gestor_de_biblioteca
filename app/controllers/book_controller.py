@@ -19,7 +19,7 @@ def is_id_valid(book_id):
 	
 	return bool(re.fullmatch(r'\d+', book_id))
 
-def search_book_by_id(book_id):
+def search_book_by_id(book_id):	
 			
 	if book_id == "":
 		return {"estado": "error", "mensaje":"El campo de búsqueda no puede estar vacío."}
@@ -32,9 +32,7 @@ def search_book_by_id(book_id):
 		return {"estado": "error", "mensaje":"No existen libros registrados para el ID ingresado."}
 	else:
 		
-		book_items, author_name, genre_name, copies = book
-
-		total_copies = len(copies)
+		book_items, author_name, genre_name, copies_data = book
 						
 		id_book = book_items[0]
 		
@@ -49,16 +47,21 @@ def search_book_by_id(book_id):
 		publisher = book_items[3]
 		
 		status = book_items[6]
-
-		total_copies = len(copies)
+		
+		formatted_copies = []
 
 		available_copies = 0
 
-		for i in copies:
+		for i in copies_data:
+			copy_list = list(i)
+			if copy_list[3] == None:
+				copy_list[3] = "---"
+			formatted_copies.append(copy_list)
 			if i[2] == "Disponible":
 				available_copies += 1
-
-		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, status,copies, total_copies, available_copies]
+				
+		total_copies = len(formatted_copies)			
+		book_details = [id_book, title,author_firstname, author_lastname, genre, isbn, publisher, status, formatted_copies, total_copies, available_copies]
 				
 		return {"estado": "ok", "mensaje":"Libro encontrado", "detalles" : book_details} 
 
@@ -123,6 +126,9 @@ def update_book(book_id, title, authors, genre, isbn, publisher, copies, status,
 
 	if int_copies < 0:
 		return {"estado": "error", "mensaje":"La cantidad de copias a añadir debe ser un número positivo o 0 si no desea añadir copias."}
+
+	if not unavailable_reason or unavailable_reason.strip() == "":
+		unavailable_reason = "---"
 
 	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, int_copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
 	
