@@ -20,10 +20,12 @@
 
 *Una vez que Libros es sólido, replicar el esquema en los otros pilares del sistema.*
 
+* [ ] **Búsqueda Global:**
+* [ ] Implementar vista de búsqueda tipo "Inventario Total" (Lectura de todos los libros).
+
 * [ ] **Módulo de Socios (Members):**
 * [ ] Desarrollar CRUD completo (Modelo, Controlador, Vista).
 * [ ] Implementar validación de DNI/ID único.
-
 
 * [ ] **Módulo de Préstamos (Loans):**
 * [ ] Lógica para asociar un `copy_id` con un `member_id`.
@@ -33,10 +35,6 @@
 * [ ] Limpiar campos de login tras ingreso exitoso.
 * [ ] Reemplazar la constante `CURRENT_USER_ID = 1` por el ID capturado dinámicamente desde la vista Home hacia las demás capas.
 * [ ] Implementar lógica de código de acceso único (OTP) para la validación de email en `resetPasswordScreen`.
-
-* [ ] **Búsqueda Global:**
-* [ ] Implementar vista de búsqueda tipo "Inventario Total" (Lectura de todos los libros).
-
 
 
 ## 🟢 Fase 3: Feedback Visual y UX (Pulido del MVP)
