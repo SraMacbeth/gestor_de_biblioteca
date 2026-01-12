@@ -29,10 +29,10 @@
 * [ ] Lógica para asociar un `copy_id` con un `member_id`.
 * [ ] Cambio automático de `status_loan` de "Disponible" a "Prestado".
 
-
 * [ ] **Gestión de Sesión Real:**
 * [ ] Limpiar campos de login tras ingreso exitoso.
 * [ ] Reemplazar la constante `CURRENT_USER_ID = 1` por el ID capturado dinámicamente desde la vista Home hacia las demás capas.
+* [ ] Implementar lógica de código de acceso único (OTP) para la validación de email en `resetPasswordScreen`.
 
 * [ ] **Búsqueda Global:**
 * [ ] Implementar vista de búsqueda tipo "Inventario Total" (Lectura de todos los libros).
@@ -59,6 +59,7 @@
 
 * [ ] **Optimización de Consultas (SQL JOINs):** Unificar las llamadas en `get_book_by_id` para traer autores y géneros en una sola sentencia.
 * [ ] **Múltiples Autores:** Rediseñar el modelo y la vista para permitir N autores por libro.
+* [ ] **Gestión de Autores:** Investigar y normalizar el manejo de autores con un solo nombre (ej. Osho, Anónimo).
 * [ ] **Motivos de Inactividad Detallados:** Ampliar el campo `unavailable_reason` con un catálogo (ej. "En reparación", "Extraviado", "Donación").
 * [ ] **Buscador Avanzado:** Implementar un buscador dinámico con filtros avanzados (por autor, por género, título o ISBN, con búsqueda predictiva). Implementar el "Doble clic para editar" (paso de parámetros entre ventanas).
 * [ ] **Validación de ISBN:** Implementar Regex para asegurar el formato estándar de 13 dígitos.
