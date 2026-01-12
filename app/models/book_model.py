@@ -241,6 +241,23 @@ class Book():
 				#Actualizar libro con los datos proporcionados
 				cursor.execute("UPDATE book set isbn = ?, title = ?, publisher = ?, genre_id = ?, user_id = ?, status = ? WHERE book_id = ?", (isbn, title, publisher, genre_id, user_id, status, book_id))
 
+				# Actualizar codigo de copias si cambia el isbn
+				cursor.execute("SELECT copy_id, copy_code FROM copy WHERE book_id = ?", (book_id,))
+				row = cursor.fetchall()
+
+				for i in row:
+					id_copy = i[0]
+    				# Extraemos el número del código actual (ej: de '123-2' extrae '2')
+					actual_index = i[1].split("-")[-1]
+    
+    				# Creamos el nuevo código con el ISBN actualizado
+					new_code = f"{isbn}-{actual_index}"
+    
+    				# Actualizamos usando el ID único de la copia
+					cursor.execute("UPDATE copy SET copy_code = ? WHERE copy_id = ?", (new_code, id_copy))
+				
+				connection.commit()
+
 				# Resetear las asociaciones de libro-autor en la tabla intermedia book_author antes de poner las nuevas
 				cursor.execute("DELETE FROM book_author WHERE book_id = ?", (book_id,))
 
