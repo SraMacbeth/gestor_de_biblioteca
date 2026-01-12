@@ -132,5 +132,53 @@ class TestBookController(unittest.TestCase):
         # Assert
         self.assertEqual(exito["estado"], "error")
         self.assertEqual(exito["mensaje"], "El libro ingresado debe tener al menos una copia.")
-        
 
+    def test_de_duplicado_en_alta(self): 
+        
+        """
+        Verifica si el ISBN ingresado por el usuario al añadir un libro ya existe en la base de datos y muestra el mensaje de error correspondiente.
+        """
+        # PREPARACIÓN:  
+        # Insertar un libro
+        datos_primer_libro = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1]
+        book_controller.add_book(*datos_primer_libro)
+
+        # Insertar un segundo libro repitiendo el ISBN del primero
+        datos_segundo_libro = ["Las venas abiertas de América Latina", [("Eduardo", "Galeano")], "Ensayo", "978-1", "Siglo XXI Editores", 1]
+
+        # Act
+        exito = book_controller.add_book(*datos_segundo_libro)
+
+        # Assert
+        self.assertEqual(exito["estado"], "error")
+        self.assertEqual(exito["mensaje"], "El libro que intenta ingresar ISBN 978-1 ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias.")
+
+    def test_de_duplicado_en_edicion(self): 
+        
+        """
+        Verifica si el nuevo ISBN ingresado por el usuario al editar un libro ya existe en la base de datos y muestra el mensaje de error correspondiente.
+        """
+        # PREPARACIÓN:  
+        # Insertar el primer libro
+        datos_primer_libro = ["Rayuela", [("Julio", "Cortázar")], "Ficción Contemporánea", "978-1", "Alfaguara", 1]
+        book_controller.add_book(*datos_primer_libro)
+
+        # Insertar el segundo libro
+        datos_segundo_libro = ["Las venas abiertas de América Latina", [("Eduardo", "Galeano")], "Ensayo", "999-2", "Siglo XXI Editores", 1]
+        book_controller.add_book(*datos_segundo_libro)
+        
+        # Buscar el ID del segundo libro en la DB por su ISBN
+        conn = test_db_setup.get_test_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT book_id FROM book WHERE isbn = ?", ("999-2",))
+        row = cursor.fetchone()
+        generated_id = str(row[0])
+        conn.close()
+        
+        # Act - Intentar editar el segundo libro poniéndole el ISBN del primero
+        nuevos_datos_segundo_libro = [generated_id, "Las venas abiertas de América Latina", [("Eduardo", "Galeano")], "Ensayo", "978-1", "Siglo XXI Editores", 1, STATUS, None]
+        exito = book_controller.update_book(*nuevos_datos_segundo_libro)
+
+        # Assert
+        self.assertEqual(exito["estado"], "error")
+        self.assertEqual(exito["mensaje"], "El ISBN ingresado ya pertenece a otro libro.")
