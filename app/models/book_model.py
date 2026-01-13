@@ -91,7 +91,7 @@ class Book():
 		try:
 
 			if copies <= 0: 
-				return False, "El modelo requiere al menos una copia."
+				return False, "El modelo requiere al menos una copia.", []
 
 			with db.get_db_connection() as connection: 
 				cursor = connection.cursor()
@@ -100,7 +100,7 @@ class Book():
 				cursor.execute("SELECT * FROM book WHERE isbn = ?", (isbn,))
 				
 				if cursor.fetchone():
-					return False, f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias."
+					return False, f"El libro que intenta ingresar ISBN {isbn} ya se encuentra en la base de datos. \nUse el formulario de Edición para ajustar la cantidad de copias.", []
 					
 				else:
 
@@ -132,16 +132,22 @@ class Book():
 							author_id = cursor.lastrowid
 						
 						cursor.execute("INSERT INTO book_author (book_id, author_id) VALUES (?, ?)", (book_id, author_id))
-												
+
+					# Lista para guardar los copy_code que se mostrarán al usuario
+					list_copy_code = []
+
 					#Insertar copias
 					for i in range(copies):
 
 						copy_code = f"{isbn}-{i+1}"
 
+						list_copy_code.append(copy_code)
+
 						cursor.execute("INSERT INTO copy (book_id, isbn, copy_code, status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, copy_code, STATUS_LOAN_AVAILABLE, user_id))
 						
 					connection.commit()
-					return True, "Libro ingresado exitosamente."
+
+					return True, "Libro ingresado exitosamente.", list_copy_code
 					
 		except sqlite3.Error as e:
 			print(f"\n--- ERROR DE SQLITE EN ADD_BOOK: {e} ---")	
@@ -175,7 +181,7 @@ class Book():
 				row = cursor.fetchone()
 
 				if row:
-					return False, "El ISBN ingresado ya pertenece a otro libro."
+					return False, "El ISBN ingresado ya pertenece a otro libro.", []
 
 				# Validacion previa a la actualizacion para verificar el estado de las copias del libro antes de intentar pasarlo a Inactivo. 
 				# Regla de integridad: un libro no puede estar inactivo si tiene copias prestadas
@@ -189,7 +195,7 @@ class Book():
 					loaned_copies_number = len(loaned_copies)
 
 					if loaned_copies_number > 0:
-						return False, "No es posible inactivar un libro que posee copias prestadas. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones."
+						return False, "No es posible inactivar un libro que posee copias prestadas. Revise el estado del libro que intenta actualizar o gestione las copias en la sección de Préstamos y Devoluciones.", []
 				
 				# Activar un libro que se encuentra Inactivo
 				# Se consulta el estado actual del libro
@@ -203,9 +209,39 @@ class Book():
 					# Automaticamente todas sus copias se ponen como "Disponible" y se limpia el valor de unavailable_reason
 					cursor.execute("UPDATE copy set status_loan = ?, unavailable_reason = ? WHERE book_id = ?", (STATUS_LOAN_AVAILABLE, None, book_id))
 
+				# Lista para guardar los copy_code que se mostrarán al usuario
+				list_copy_code = []
+
+				# Actualizar codigo de copias si cambia el isbn
+
+				# Se captura el ISBN actual
+				cursor.execute("SELECT isbn FROM book WHERE book_id = ?", (book_id,))
+				row = cursor.fetchone()
+				actual_isbn = row[0]
+
+				if actual_isbn != isbn:
+
+					cursor.execute("SELECT copy_id, copy_code FROM copy WHERE book_id = ?", (book_id,))
+					row = cursor.fetchall()
+
+					for i in row:
+						id_copy = i[0]
+						# Extraemos el número del código actual (ej: de '123-2' extrae '2')
+						actual_index = i[1].split("-")[-1]
+		
+						# Creamos el nuevo código con el ISBN actualizado
+						new_code = f"{isbn}-{actual_index}"
+						
+						list_copy_code.append(new_code)
+		
+						# Actualizamos usando el ID único de la copia
+						cursor.execute("UPDATE copy SET copy_code = ? WHERE copy_id = ?", (new_code, id_copy))
+					
+						connection.commit()
+
 				# Insertar copias
 				if copies < 0:
-					return False, "La cantidad de copias a añadir debe ser un número positivo o 0 si no desea añadir copias."	
+					return False, "La cantidad de copias a añadir debe ser un número positivo o 0 si no desea añadir copias.", []	
 				
 				elif copies >= 0:
 					# Buscar el último `copy_code` existente para este book_id
@@ -225,6 +261,8 @@ class Book():
 
 						new_copy_code = f"{isbn}-{sum_str}"
 
+						list_copy_code.append(new_copy_code)
+
 						cursor.execute("INSERT INTO copy (book_id, isbn, copy_code, status_loan, user_id) VALUES (?, ?, ?, ?, ?)", (book_id, isbn, new_copy_code, STATUS_LOAN_AVAILABLE, user_id))
 					
 				#Extraer genre_id o ingresar un nuevo género si no existe
@@ -237,27 +275,11 @@ class Book():
 				else:
 					cursor.execute("INSERT INTO genre (name) VALUES (?)", (genre,))
 					genre_id = cursor.lastrowid
-				
+
 				#Actualizar libro con los datos proporcionados
 				cursor.execute("UPDATE book set isbn = ?, title = ?, publisher = ?, genre_id = ?, user_id = ?, status = ? WHERE book_id = ?", (isbn, title, publisher, genre_id, user_id, status, book_id))
 
-				# Actualizar codigo de copias si cambia el isbn
-				cursor.execute("SELECT copy_id, copy_code FROM copy WHERE book_id = ?", (book_id,))
-				row = cursor.fetchall()
-
-				for i in row:
-					id_copy = i[0]
-    				# Extraemos el número del código actual (ej: de '123-2' extrae '2')
-					actual_index = i[1].split("-")[-1]
-    
-    				# Creamos el nuevo código con el ISBN actualizado
-					new_code = f"{isbn}-{actual_index}"
-    
-    				# Actualizamos usando el ID único de la copia
-					cursor.execute("UPDATE copy SET copy_code = ? WHERE copy_id = ?", (new_code, id_copy))
-				
-				connection.commit()
-
+	
 				# Resetear las asociaciones de libro-autor en la tabla intermedia book_author antes de poner las nuevas
 				cursor.execute("DELETE FROM book_author WHERE book_id = ?", (book_id,))
 
@@ -281,7 +303,7 @@ class Book():
 
 				connection.commit()
 
-				return True, "Libro actualizado correctamente"			
+				return True, "Libro actualizado correctamente", list_copy_code			
 
 		except sqlite3.Error as e:
 			print(f"\n--- ERROR DE SQLITE EN UPDATE_BOOK: {e} ---")	

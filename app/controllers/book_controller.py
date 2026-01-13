@@ -19,6 +19,15 @@ def is_id_valid(book_id):
 	
 	return bool(re.fullmatch(r'\d+', book_id))
 
+def format_copy_codes(codes_list):
+	
+	formatted_list = ""
+	
+	for code in codes_list:
+		formatted_list += f"\n• {code}"
+	
+	return formatted_list
+
 def search_book_by_id(book_id):	
 			
 	if book_id == "":
@@ -91,12 +100,22 @@ def add_book(title, authors, genre, isbn, publisher, copies):
 	if int_copies <= 0:
 		return {"estado": "error", "mensaje":"El libro ingresado debe tener al menos una copia."}
 
-	new_book = Book.add_book(title, authors, genre, isbn, publisher, int_copies, status=STATUS,user_id=CURRENT_USER_ID)
+	success, message, copy_codes = Book.add_book(title, authors, genre, isbn, publisher, int_copies, status=STATUS,user_id=CURRENT_USER_ID)
 	
-	if new_book[0] == False:
-		return {"estado": "error", "mensaje": new_book[1]}
+	if success == False:
+		return {"estado": "error", "mensaje": message}
 	else:
-		return {"estado": "ok", "mensaje": new_book[1]}
+		if copy_codes:
+
+			final_message = message 
+			
+			header = "\n\nTome nota de los códigos de copia generados por el sistema:\n"
+			
+			formatted_list = format_copy_codes(copy_codes)
+
+			final_message += header + formatted_list
+		
+		return {"estado": "ok", "mensaje": final_message}
 
 def update_book(book_id, title, authors, genre, isbn, publisher, copies, status, unavailable_reason):
 
@@ -130,9 +149,21 @@ def update_book(book_id, title, authors, genre, isbn, publisher, copies, status,
 	if not unavailable_reason or unavailable_reason.strip() == "":
 		unavailable_reason = "---"
 
-	updated_book = Book.update_book(book_id, title, authors, genre, isbn, publisher, int_copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
+	success, message, copy_codes = Book.update_book(book_id, title, authors, genre, isbn, publisher, int_copies, status, unavailable_reason, user_id=CURRENT_USER_ID)
+
+	final_message = message
 	
-	if updated_book[0] == False:
-		return {"estado": "error", "mensaje": updated_book[1]}
+	if success == False:
+		return {"estado": "error", "mensaje": message}
 	else:
-		return {"estado": "ok", "mensaje":updated_book[1]}
+		if copy_codes:
+
+			final_message = message 
+			
+			header = "\n\nTome nota de los códigos de copia generados por el sistema:\n"
+			
+			formatted_list = format_copy_codes(copy_codes)
+
+			final_message += header + formatted_list
+		
+		return {"estado": "ok", "mensaje": final_message}
